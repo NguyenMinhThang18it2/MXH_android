@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp"
+    android:paddingTop="10dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="14">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/avataUserCmt"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="top"
+                android:src="@drawable/user" />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="2">
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <RelativeLayout
+                    android:paddingRight="10dp"
+                    android:paddingTop="10dp"
+                    android:paddingLeft="10dp"
+                    android:id="@+id/RelativeTextComment"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/border_text_comment">
+                        <TextView
+                            android:id="@+id/txtNameUsercmt"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Thắng Nguyễn"
+                            android:textStyle="bold"
+                            android:textColor="@color/title"
+                            android:textSize="18sp"/>
+                        <TextView
+                            android:layout_below="@+id/txtNameUsercmt"
+                            android:id="@+id/txtUserCmt"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="18sp"
+                            android:text="aaaaaaaaaaaaaaaaaaaaaaa aaaaaaaaaaaaaaaaaaa aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa aaaaaaaaaaaaaaaaaaaaaaaaa aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"/>
+                        <FrameLayout
+                            android:layout_alignParentRight="true"
+                            android:layout_below="@+id/txtUserCmt"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="-10dp">
+                            <androidx.cardview.widget.CardView
+                                app:cardElevation="5dp"
+                                app:cardCornerRadius="5dp"
+                                app:cardBackgroundColor="@android:color/white"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content">
+                                <LinearLayout
+                                    android:paddingTop="3dp"
+                                    android:paddingLeft="3dp"
+                                    android:paddingRight="3dp"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal">
+                                    <de.hdodenhof.circleimageview.CircleImageView
+                                        android:id="@+id/imgIconLikeCmt1"
+                                        android:layout_width="15dp"
+                                        android:layout_height="15dp"
+                                        android:src="@drawable/ic_facebook_blue_like_24" />
+
+                                    <!--                                <de.hdodenhof.circleimageview.CircleImageView-->
+                                    <!--                                    android:id="@+id/imgIconLikeCmt2"-->
+                                    <!--                                    android:layout_width="15dp"-->
+                                    <!--                                    android:layout_height="15dp"-->
+                                    <!--                                    android:layout_marginLeft="-5dp"-->
+                                    <!--                                    android:src="@drawable/user" />-->
+
+                                    <!--                                <de.hdodenhof.circleimageview.CircleImageView-->
+                                    <!--                                    android:id="@+id/imgIconLikeCmt3"-->
+                                    <!--                                    android:layout_width="15dp"-->
+                                    <!--                                    android:layout_height="15dp"-->
+                                    <!--                                    android:layout_marginLeft="-5dp"-->
+                                    <!--                                    android:src="@drawable/splash" />-->
+                                    <TextView
+                                        android:id="@+id/txtNumberLikeCmt"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginLeft="5dp"
+                                        android:layout_marginTop="-3dp"
+                                        android:text="22"
+                                        android:textSize="16sp" />
+                                </LinearLayout>
+
+
+
+                            </androidx.cardview.widget.CardView>
+                        </FrameLayout>
+                </RelativeLayout>
+                <RelativeLayout
+                    android:id="@+id/ImgAndIconLike"
+                    android:layout_below="@+id/RelativeTextComment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/buttonback">
+                    <com.makeramen.roundedimageview.RoundedImageView
+                        android:id="@+id/imgComment"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:maxWidth="350dp"
+                        android:maxHeight="200dp"
+                        android:scaleType="centerCrop"
+                        app:riv_corner_radius_top_left="20dp"
+                        app:riv_corner_radius_top_right="20dp"
+                        app:riv_corner_radius_bottom_left="20dp"
+                        app:riv_corner_radius_bottom_right="20dp"
+                        />
+                </RelativeLayout>
+                <LinearLayout
+                    android:id="@+id/linearLikeTimeReply"
+                    android:layout_below="@+id/ImgAndIconLike"
+                    android:layout_width="150dp"
+                    android:layout_height="21dp"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="5dp">
+                    <TextView
+                        android:id="@+id/txtTimeCmt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Time"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/btnLike"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Thích"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/btnReplyCmt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Trả lời"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </RelativeLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+</LinearLayout>

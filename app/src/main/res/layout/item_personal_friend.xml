@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:foreground="?android:attr/selectableItemBackground"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingTop="5dp"
+    android:paddingBottom="5dp">
+    <com.makeramen.roundedimageview.RoundedImageView
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/imgThemeStatus"
+        android:scaleType="fitCenter"
+        android:src="@drawable/user"
+        app:riv_corner_radius="30dip"
+        app:riv_mutate_background="true"
+        app:riv_tile_mode="clamp"
+        app:riv_corner_radius_bottom_left="10dp"
+        app:riv_corner_radius_bottom_right="10dp"
+        app:riv_corner_radius_top_left="10dp"
+        app:riv_corner_radius_top_right="10dp"/>
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:maxWidth="120dp"
+        android:gravity="center"
+        android:textSize="13sp"
+        android:textColor="@color/colorText"
+        android:text="Nguyễn Minh Thắng"
+        android:fontFamily="sans-serif-medium"/>
+</LinearLayout>

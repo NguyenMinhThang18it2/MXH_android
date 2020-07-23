@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#5476FF</color>
+    <color name="colorPrimaryDark">#3700B3</color>
+    <color name="colorAccent">#FF0216</color>
+    <color name="colorWhite">#FFFFFF</color>
+    <color name="colorDivider">#ECECEC</color>
+    <color name="placeHolderBG">#dddddd</color>
+    <color name="title">#000000</color>
+    <color name="colorText">#505050</color>
+    <color name="trans">#80000000</color>
+    <color name="notificationCheck">#DAE5FF</color>
+    <color name="xanhdatroi">#070AFB</color>
+    <color name="xemallstory">#9CB0FF</color>
+</resources>

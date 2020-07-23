@@ -1,0 +1,2 @@
+rootProject.name='Uptimum'
+include ':app'

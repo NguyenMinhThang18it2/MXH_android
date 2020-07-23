@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/upload_new_status"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/border_top"
+    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <RelativeLayout
+            android:id="@+id/headertop"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:padding="5dp">
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true">
+                <ImageView
+                    android:id="@+id/btnBackUpload"
+                    android:layout_width="50dp"
+                    android:layout_height="30dp"
+                    android:layout_marginTop="5dp"
+                    android:src="@drawable/ic_arrow_back_black_24dp"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tạo bài viết"
+                    android:textSize="26sp"
+                    android:textColor="@color/title"
+                    android:layout_toRightOf="@id/btnBackUpload"/>
+                <TextView
+                    android:id="@+id/btnUpload"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Đăng"
+                    android:textColor="#494848"
+                    android:textSize="20sp"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginTop="6dp"
+                    android:layout_alignParentEnd="true"/>
+            </RelativeLayout>
+        </RelativeLayout>
+        <View
+            android:layout_below="@+id/headertop"
+            android:layout_width="match_parent"
+            android:layout_height="0.1dp"
+            android:background="#919191"/>
+        <androidx.core.widget.NestedScrollView
+            android:layout_below="@+id/headertop"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="10dp"
+                    android:paddingLeft="10dp"
+                    android:paddingBottom="10dp"
+                    android:paddingRight="10dp">
+
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/user"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:src="@drawable/user"/>
+                    <TextView
+                        android:id="@+id/txtusername"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toRightOf="@+id/user"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginTop="-5dp"
+                        android:textColor="@color/title"
+                        android:textSize="24sp"
+                        android:textStyle="bold"
+                        android:text="Thắng Nguyễn"
+                        />
+                    <TextView
+                        android:padding="3.1dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toRightOf="@+id/user"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginTop="0dp"
+                        android:drawableLeft="@drawable/ic_public_black_16dp"
+                        android:background="@drawable/borderlevel"
+                        android:drawableRight="@drawable/ic_arrow_drop_down_black_24dp"
+                        android:textSize="12dp"
+                        android:text=" Công khai"
+                        android:layout_below="@id/txtusername"
+                        />
+                </RelativeLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    <EditText
+                        android:id="@+id/eddocument"
+                        android:layout_width="match_parent"
+                        android:layout_height="250dp"
+                        android:autoSizeTextType="uniform"
+                        android:background="#ffffff"
+                        android:gravity="top"
+                        android:hint="Bạn đang nghĩ gì?"
+                        android:inputType="text|textMultiLine"
+                        android:padding="10dp"
+                        android:textSize="26sp" />
+
+                    <EditText
+                        android:id="@+id/textareaBackground"
+                        android:visibility="gone"
+                        android:layout_width="match_parent"
+                        android:layout_height="250dp"
+                        android:autoSizeTextType="uniform"
+                        android:autoSizeMinTextSize="12sp"
+                        android:autoSizeMaxTextSize="28sp"
+                        android:autoSizeStepGranularity="1sp"
+                        android:textSize="26sp"
+                        android:maxLength="100"
+                        android:lines="5"
+                        android:gravity="center"
+                        android:textColor="@color/title"
+                        android:hint="Bạn đang nghĩ gì?"
+                        />
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/rcvSelectmultiple"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"/>
+                    </LinearLayout>
+                    <ImageView
+                        android:visibility="gone"
+                        android:id="@+id/imgUpload"
+                        android:layout_width="match_parent"
+                        android:layout_height="500dp" />
+                    <FrameLayout
+                        android:id="@+id/framevideo"
+                        android:layout_width="match_parent"
+                        android:layout_height="700dp"
+                        android:visibility="gone">
+                        <VideoView
+                            android:id="@+id/videoUpload"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"/>
+                    </FrameLayout>
+                </LinearLayout>
+
+            </LinearLayout>
+        </androidx.core.widget.NestedScrollView>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_gravity="bottom">
+                <LinearLayout
+                    android:id="@+id/linerTheme"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recylerTheme"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_below="@+id/linerTheme"
+                    android:id="@+id/menuUploadStatus"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/btnUploadnow"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:padding="5dp">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="2"
+                                android:src="@drawable/icon_uploadimage" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:layout_weight="8"
+                                android:text="Upload image"
+                                android:textColor="@color/colorText"
+                                android:textSize="22sp" />
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/btnUploadVideo"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border_card">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:padding="5dp">
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="2"
+                                android:src="@drawable/ic_upload_video_player" />
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:layout_weight="8"
+                                android:text="Upload Video"
+                                android:textColor="@color/colorText"
+                                android:textSize="22sp" />
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border_card">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:padding="5dp">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="2"
+                                android:src="@drawable/ic_pload_tabfriend" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:layout_marginLeft="-6dp"
+                                android:layout_weight="8"
+                                android:text="Tag friends"
+                                android:textColor="@color/colorText"
+                                android:textSize="22sp" />
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border_card">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:padding="5dp">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="10dp"
+                                android:layout_weight="2"
+                                android:src="@drawable/ic_smile" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:layout_marginLeft="12dp"
+                                android:layout_weight="8"
+                                android:text="Emotions / Activities"
+                                android:textColor="@color/colorText"
+                                android:textSize="22sp" />
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border_card">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:padding="5dp">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="2"
+                                android:src="@drawable/ic_check_in" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:layout_marginLeft="-10dp"
+                                android:layout_weight="8"
+                                android:text="Check in"
+                                android:textColor="@color/colorText"
+                                android:textSize="22sp" />
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/uploadCamera"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/border_card">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:padding="5dp">
+
+                            <ImageView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginLeft="-5dp"
+                                android:layout_weight="2"
+                                android:src="@drawable/ic_upload_camera" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="match_parent"
+                                android:layout_marginLeft="-16dp"
+                                android:layout_weight="8"
+                                android:text="Camera"
+                                android:textColor="@color/colorText"
+                                android:textSize="22sp" />
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+                </LinearLayout>
+                <LinearLayout
+                    android:visibility="gone"
+                    android:layout_below="@+id/linerTheme"
+                    android:id="@+id/menuUploadStatausMinimize"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    <View
+                        android:layout_below="@+id/headertop"
+                        android:layout_width="match_parent"
+                        android:layout_height="0.1dp"
+                        android:background="#919191"/>
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/btnUploadnowa"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:padding="5dp">
+
+                            <TextView
+                                android:layout_gravity="center"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="7"
+                                android:text="Thêm vào bài viết của bạn"
+                                android:textColor="@color/colorText"
+                                android:textSize="18sp" />
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="3"
+                                android:orientation="horizontal">
+                                <ImageView
+                                    android:layout_width="20dp"
+                                    android:layout_height="20dp"
+                                    android:src="@drawable/icon_uploadimage" />
+                                <ImageView
+                                    android:layout_width="20dp"
+                                    android:layout_height="20dp"
+                                    android:layout_marginLeft="5dp"
+                                    android:src="@drawable/ic_upload_video_player" />
+                                <ImageView
+                                    android:layout_marginLeft="5dp"
+                                    android:layout_width="20dp"
+                                    android:layout_height="20dp"
+                                    android:src="@drawable/ic_upload_camera" />
+                                <ImageView
+                                    android:layout_marginLeft="5dp"
+                                    android:layout_width="20dp"
+                                    android:layout_height="20dp"
+                                    android:src="@drawable/ic_smile" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </RelativeLayout>
+</LinearLayout>
