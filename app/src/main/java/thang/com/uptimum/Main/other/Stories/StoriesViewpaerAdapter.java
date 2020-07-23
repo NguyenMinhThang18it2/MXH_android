@@ -1,4 +1,4 @@
-package thang.com.uptimum.Main.other;
+package thang.com.uptimum.Main.other.Stories;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;

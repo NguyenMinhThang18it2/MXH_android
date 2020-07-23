@@ -43,8 +43,8 @@
 
                         <de.hdodenhof.circleimageview.CircleImageView
                             android:id="@+id/circleImageViewAvata"
-                            android:layout_width="150dp"
-                            android:layout_height="150dp"
+                            android:layout_width="200dp"
+                            android:layout_height="200dp"
                             android:src="@drawable/user"
                             app:civ_border_color="#ffffff"
                             app:civ_border_width="10dp"
@@ -107,6 +107,7 @@
                         android:textSize="22sp"
                         android:textColor="#000000"/>
                 </LinearLayout>
+<!--               userLogin -->
                 <LinearLayout
                     android:visibility="gone"
                     android:id="@+id/linearUserLogin"
@@ -116,6 +117,29 @@
                     android:gravity="center"
                     android:weightSum="1">
                     <LinearLayout
+                        android:visibility="gone"
+                        android:id="@+id/btnAddNewProfile"
+                        android:layout_weight="0.2"
+                        android:background="@drawable/button_edit_personnal"
+                        android:layout_width="match_parent"
+                        android:gravity="center"
+                        android:layout_height="40dp"
+                        android:layout_marginRight="10dp"
+                        android:layout_marginLeft="20dp">
+                        <TextView
+                            android:id="@+id/txtAddNewProfile"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_horizontal"
+                            android:drawableLeft="@drawable/ic_edit_black_24dp"
+                            android:text="Thêm thông tin vào hồ sơ"
+                            android:textColor="@color/white"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:visibility="gone"
+                        android:id="@+id/btnEditProfile"
                         android:layout_weight="0.2"
                         android:background="@drawable/button_edit_personnal"
                         android:layout_width="match_parent"
@@ -148,6 +172,7 @@
                             android:drawableLeft="@drawable/ic_more_horiz_black_24dp"/>
                     </LinearLayout>
                 </LinearLayout>
+<!--                other user-->
                 <LinearLayout
                     android:id="@+id/linearOtherPeople"
                     android:visibility="gone"
@@ -166,7 +191,7 @@
                         android:layout_marginRight="10dp"
                         android:layout_marginLeft="20dp">
                         <TextView
-                            android:visibility="visible"
+                            android:visibility="gone"
                             android:id="@+id/txtAddFriend"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -401,7 +426,8 @@
                             android:textColor="@color/xanhdatroi"/>
                     </RelativeLayout>
                     <androidx.recyclerview.widget.RecyclerView
-                        android:layout_width="wrap_content"
+                        android:id="@+id/rcvFriendPf"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"/>
                     <LinearLayout
                         android:layout_width="match_parent"

@@ -20,6 +20,13 @@ public class SplashActivity extends AppCompatActivity {
     private Animation topAnimation, bottomAnimation;
     private ImageView image;
     private TextView tvSlogan;
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        image.setImageDrawable(null);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

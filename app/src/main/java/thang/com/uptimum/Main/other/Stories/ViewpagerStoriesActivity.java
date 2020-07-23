@@ -1,4 +1,4 @@
-package thang.com.uptimum.Main.other;
+package thang.com.uptimum.Main.other.Stories;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -12,7 +12,6 @@ import android.util.Log;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import retrofit2.Call;
@@ -20,7 +19,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import thang.com.uptimum.R;
-import thang.com.uptimum.adapter.storyAdapter;
 import thang.com.uptimum.model.Story;
 import thang.com.uptimum.network.NetworkUtil;
 import thang.com.uptimum.network.StoryRetrofit;
@@ -44,8 +42,8 @@ public class ViewpagerStoriesActivity extends AppCompatActivity {
         Intent intent = getIntent();
         numberStory  = (int) intent.getSerializableExtra("numberClickStory");
         Log.d("storhjkl", " "+numberStory);
-        getStory();
         networkUtil = new NetworkUtil();
+        getStory();
         viewPager2story.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position) {

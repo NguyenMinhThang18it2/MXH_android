@@ -38,7 +38,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import thang.com.uptimum.Dialog.CommentBottomSheetDialog;
 import thang.com.uptimum.Dialog.DialogShowImageStatus;
-import thang.com.uptimum.Main.other.ViewpagerStoriesActivity;
+import thang.com.uptimum.Main.other.Stories.ViewpagerStoriesActivity;
 import thang.com.uptimum.R;
 import thang.com.uptimum.adapter.postsAdapter;
 import thang.com.uptimum.adapter.storyAdapter;
@@ -132,10 +132,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener , Com
         networkUtil = new NetworkUtil();
         retrofit = networkUtil.getRetrofit();
         addEvents();
+        setOnClickListener();
         getStory();
         getPosts();
         addDataUserlogin();
-        setOnClickListener();
+
 
 
         return contactsview;
@@ -171,6 +172,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener , Com
             case R.id.user:
                 Intent personal = new Intent(getActivity().getApplicationContext(), PersonalActivity.class);
                 personal.putExtra("iduser", id);
+                personal.putExtra("avata",avata);
+                personal.putExtra("coverimage", coverimage);
+                personal.putExtra("username",username);
                 startActivity(personal);
                 break;
             default:
@@ -241,13 +245,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener , Com
                         arrayStory.add(story);
                     }
                 }
-
-                adapterStory = new storyAdapter(arrayStory, getActivity().getApplicationContext());
-                recyclerViewStory.setAdapter(adapterStory);
-
-                shimmerLayout.stopShimmerAnimation();
-                nestedScrollView.setVisibility(View.VISIBLE);
-                shimmerLayout.setVisibility(View.GONE);
+                adapterStory.notifyDataSetChanged();
+                call.cancel();
             }
 
             @Override
@@ -255,8 +254,15 @@ public class HomeFragment extends Fragment implements View.OnClickListener , Com
                 Log.d("loaddataa","Load không được lỗi : "+t.getMessage());
                 shimmerLayout.setVisibility(View.GONE);
                 txtThongbao.setVisibility(View.VISIBLE);
+                call.cancel();
             }
         });
+        adapterStory = new storyAdapter(arrayStory, getActivity().getApplicationContext());
+        recyclerViewStory.setAdapter(adapterStory);
+
+        shimmerLayout.stopShimmerAnimation();
+        nestedScrollView.setVisibility(View.VISIBLE);
+        shimmerLayout.setVisibility(View.GONE);
     }
 
     private void getPosts() {
@@ -277,17 +283,18 @@ public class HomeFragment extends Fragment implements View.OnClickListener , Com
                     arrayPosts.add(post);
                 }
 //                Collections.reverse(arrayPosts);
-
-                adapterPosts = new postsAdapter(arrayPosts, getActivity().getApplicationContext(), listener);
                 adapterPosts.notifyDataSetChanged();
-                recyclerViewstatus.setAdapter(adapterPosts);
+                call.cancel();
             }
 
             @Override
             public void onFailure(Call<List<Posts>> call, Throwable t) {
                 Log.d("lỗi posts",t.getMessage(),t);
+                call.cancel();
             }
         });
+        adapterPosts = new postsAdapter(arrayPosts, getActivity().getApplicationContext(), listener);
+        recyclerViewstatus.setAdapter(adapterPosts);
     }
     private void setOnClickListener(){
         listener = new postsAdapter.RecyclerviewClickListener() {
@@ -299,9 +306,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener , Com
                             CommentBottomSheetDialog(arrayPosts.get(position).getId());
                     commentBottomSheetDialog.show(getFragmentManager(),
                             "add_photo_dialog_fragment");
-
             }
-
             @Override
             public void showImg(ImageView imgShow, int position, int typeClick) {
                 DialogShowImageStatus dialogShowImageStatus = new DialogShowImageStatus(position, arrayPosts);

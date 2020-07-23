@@ -52,25 +52,25 @@ public class AdapterShowMultipleImg extends RecyclerView.Adapter<AdapterShowMult
         switch (UrlImg.size()){
             case 1:
                 Picasso.get().load(BASE_URL + "uploads/" + UrlImg.get(position))
-                        .memoryPolicy(MemoryPolicy.NO_CACHE).resize(250,600).into(holder.itemShowMultiImg);
+                        .resize(250,400).into(holder.itemShowMultiImg);
                 break;
             case 2:
                 param.height = 1000 / 2;
                 holder.itemShowMultiImg.setLayoutParams(param);
                 Picasso.get().load(BASE_URL + "uploads/" + UrlImg.get(position))
-                        .memoryPolicy(MemoryPolicy.NO_CACHE).resize(250,600).into(holder.itemShowMultiImg);
+                        .resize(250,400).into(holder.itemShowMultiImg);
                 break;
             case 3:
                 param.height = 1000 / 3;
                 holder.itemShowMultiImg.setLayoutParams(param);
                 Picasso.get().load(BASE_URL + "uploads/" + UrlImg.get(position))
-                        .memoryPolicy(MemoryPolicy.NO_CACHE).resize(250,600).into(holder.itemShowMultiImg);
+                        .resize(250,400).into(holder.itemShowMultiImg);
                 break;
             default:
                 param.height = 1000 / 3;
                 holder.itemShowMultiImg.setLayoutParams(param);
                 Picasso.get().load(BASE_URL + "uploads/" + UrlImg.get(position))
-                        .memoryPolicy(MemoryPolicy.NO_CACHE).resize(250,600).into(holder.itemShowMultiImg);
+                        .resize(250,600).into(holder.itemShowMultiImg);
                 if(position == 2){
                     holder.rltloCountImg.setVisibility(View.VISIBLE);
                     int count = UrlImg.size() - 4;

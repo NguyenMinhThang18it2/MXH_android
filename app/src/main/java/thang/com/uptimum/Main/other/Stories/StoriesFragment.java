@@ -1,4 +1,4 @@
-package thang.com.uptimum.Main.other;
+package thang.com.uptimum.Main.other.Stories;
 
 import android.os.Bundle;
 
@@ -19,7 +19,7 @@ import jp.shts.android.storiesprogressview.StoriesProgressView;
 import thang.com.uptimum.R;
 import thang.com.uptimum.model.Story;
 
-import static thang.com.uptimum.Main.other.ViewpagerStoriesActivity.viewPager2story;
+import static thang.com.uptimum.Main.other.Stories.ViewpagerStoriesActivity.viewPager2story;
 import static thang.com.uptimum.util.Constants.BASE_URL;
 
 public class StoriesFragment extends Fragment implements StoriesProgressView.StoriesListener {
@@ -42,7 +42,7 @@ public class StoriesFragment extends Fragment implements StoriesProgressView.Sto
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragmentview = inflater.inflate(R.layout.fragment_stories, container, false);
+        view = inflater.inflate(R.layout.fragment_stories, container, false);
         getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         linearLayoutStory = (LinearLayout) view.findViewById(R.id.imgStoryhear);

@@ -1,6 +1,5 @@
 package thang.com.uptimum.adapter;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
@@ -14,12 +13,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.squareup.picasso.MemoryPolicy;
-import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
-import thang.com.uptimum.Main.other.ViewpagerStoriesActivity;
+import thang.com.uptimum.Main.other.Stories.ViewpagerStoriesActivity;
 import thang.com.uptimum.R;
 import thang.com.uptimum.model.Story;
 

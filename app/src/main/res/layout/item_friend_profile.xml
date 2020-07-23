@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/linearFriendPf"
+    android:padding="10dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <com.makeramen.roundedimageview.RoundedImageView
+        android:id="@+id/rimgvAvataFriendPf"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:src="@drawable/user"
+        android:scaleType="centerCrop"
+        app:riv_corner_radius_bottom_right="10dp"
+        app:riv_corner_radius_top_right="10dp"
+        app:riv_corner_radius_top_left="10dp"
+        app:riv_corner_radius_bottom_left="10dp"/>
+    <TextView
+        android:id="@+id/txtNameFriendPf"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="@color/colorText"
+        android:text="Nguyễn Minh Thắng"/>
+</LinearLayout>

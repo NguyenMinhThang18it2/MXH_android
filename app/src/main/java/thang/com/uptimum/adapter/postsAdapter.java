@@ -397,8 +397,6 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
 
         @Override
         public void onClick(View v) {
-
-
             switch (v.getId()){
                 case R.id.volume_control:
                     turnOnOffVolume(volume_control);

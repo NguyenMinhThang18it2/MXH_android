@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity {
     private TabLayoutMediator tabLayoutMediator;
     private BadgeDrawable badgeDrawable;
     private int numberStatus, numberNotify, numberVideo, numberMess;
-    public static Toolbar toolBar;
+    private Toolbar toolBar;
     private ArrayList<ListNotification> listNotifications;
 
     private SharedPreferences sessionManagement ;
