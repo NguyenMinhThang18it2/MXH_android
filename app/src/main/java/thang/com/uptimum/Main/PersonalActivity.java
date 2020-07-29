@@ -6,13 +6,21 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.appcompat.widget.Toolbar;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.app.Application;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Parcelable;
+import android.provider.DocumentsContract;
+import android.provider.MediaStore;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
@@ -23,13 +31,22 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.appbar.AppBarLayout;
+import com.google.gson.JsonObject;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import io.socket.emitter.Emitter;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -38,10 +55,12 @@ import thang.com.uptimum.Dialog.CommentBottomSheetDialog;
 import thang.com.uptimum.Dialog.DialogShowImageStatus;
 import thang.com.uptimum.Main.other.Personal.Personal_informationActivity;
 import thang.com.uptimum.Main.other.Personal.ShowImagePersonalActivity;
+import thang.com.uptimum.Main.other.StatusDetail.StatusDetailActivity;
 import thang.com.uptimum.R;
 import thang.com.uptimum.Socket.SocketIO;
 import thang.com.uptimum.adapter.AdapterFriendPf;
 import thang.com.uptimum.adapter.postsAdapter;
+import thang.com.uptimum.model.Error;
 import thang.com.uptimum.model.Followers;
 import thang.com.uptimum.model.Following;
 import thang.com.uptimum.model.Friend;
@@ -56,6 +75,7 @@ import thang.com.uptimum.network.ProfileRetrofit;
 import thang.com.uptimum.upload.UploadPostsActivity;
 
 import static thang.com.uptimum.util.Constants.BASE_URL;
+import static thang.com.uptimum.Socket.SocketIO.socket;
 
 public class PersonalActivity extends AppCompatActivity implements View.OnClickListener {
     private final String TAG = "PersonalActivity";
@@ -68,10 +88,12 @@ public class PersonalActivity extends AppCompatActivity implements View.OnClickL
             txtPfStatus, txtMess, txtAddFriend;
     private LinearLayout linearUserLogin, linearOtherPeople, linearProfileJob, linearProfileStudies,
             linearProfileStudied, linearProfilePlaceslive, linearProfileFrom, linearProfileFollower, linearPfShowImg, btnAddNewProfile
-            , btnEditProfile;
+            , btnEditProfile, OtherPeopleAdd, OtherPeopletxtMess;
     //thông tin user
+    private SwipeRefreshLayout refreshPersonal;
     private SharedPreferences sessionManagement;
-    private String id = "", iduserLogin ="", avata ="", coverimage ="", username="", nickname ="";
+    private String id = "", iduserLogin ="", avata ="", coverimage ="";
+    private String username="", nickname="", phone="", dateofbirth="",studies="", studied="", placeslive="", from="", job="";
     //retrofit
     private ProfileRetrofit profileRetrofit;
     private FollowRetrofit followRetrofit;
@@ -90,12 +112,39 @@ public class PersonalActivity extends AppCompatActivity implements View.OnClickL
     private postsAdapter.RecyclerviewClickListener listenerPosts;
     private AdapterFriendPf.OnclickRecycelListener mListenerFriend;
 
-    private boolean checkProfile = true;
+    private boolean checkProfile = true, checkImg = true;
+
+    private final int PICK_AVATA_REQUEST = 123;
+    private final int PICK_COVERIMG_REQUEST = 456;
+    private Uri uri;
+    private String realdPath = "";
+
+    private Toolbar toolbar;
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_personal);
+        toolbar = (Toolbar) findViewById(R.id.toolbarPersonal);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
         SocketIO socketIO = new SocketIO();
         socketIO.ConnectSocket();
         networkUtil = new NetworkUtil();
@@ -106,14 +155,17 @@ public class PersonalActivity extends AppCompatActivity implements View.OnClickL
         setOnClickRecyclerViewListener();
         mapingView();
         getIdUser();
-        getDataUser();
         getNumberFollower();
         getFriend();
+        getDataUser();
         getPostsUser();
         setEvenOnClickListener();
 
     }
     private void mapingView(){
+        refreshPersonal = (SwipeRefreshLayout) findViewById(R.id.refreshPersonal);
+        OtherPeopleAdd = (LinearLayout) findViewById(R.id.OtherPeopleAdd);
+        OtherPeopletxtMess = (LinearLayout) findViewById(R.id.OtherPeopletxtMess);
         roundedImageViewCover = (RoundedImageView) findViewById(R.id.roundedImageViewCover);
         circleImageViewAvata = (CircleImageView) findViewById(R.id.circleImageViewAvata);
         AvataPosts = (CircleImageView) findViewById(R.id.AvataPosts);
@@ -153,11 +205,43 @@ public class PersonalActivity extends AppCompatActivity implements View.OnClickL
         linearLayoutManager = new LinearLayoutManager(PersonalActivity.this,LinearLayoutManager.VERTICAL,false);
         rcvPostsUser.setLayoutManager(linearLayoutManager);
     }
+    public void freeMemory(){
+        System.runFinalization();
+        Runtime.getRuntime().gc();
+        System.gc();
+
+//        getFragmentManager().beginTransaction().addToBackStack(null).commit();
+    }
+    private void clearData(){
+        rcvFriendPf.getRecycledViewPool().clear();
+        rcvFriendPf.setAdapter(null);
+        rcvPostsUser.getRecycledViewPool().clear();
+        rcvPostsUser.setAdapter(null);
+
+    }
     private void setEvenOnClickListener(){
+        refreshPersonal.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                clearData();
+                getIdUser();
+                getNumberFollower();
+                getFriend();
+                getDataUser();
+                getPostsUser();
+                setEvenOnClickListener();
+                freeMemory();
+                refreshPersonal.setRefreshing(false);
+            }
+        });
         txtPfStatus.setOnClickListener(this);
         linearPfShowImg.setOnClickListener(this);
         btnAddNewProfile.setOnClickListener(this);
         btnEditProfile.setOnClickListener(this);
+        ChangeCoverImage.setOnClickListener(this);
+        ChangeAvata.setOnClickListener(this);
+        OtherPeopleAdd.setOnClickListener(this);
+        OtherPeopletxtMess.setOnClickListener(this);
     }
     private void checkProfileUser(){
         if(id.equals(iduserLogin)){
@@ -170,40 +254,90 @@ public class PersonalActivity extends AppCompatActivity implements View.OnClickL
             }
         }else{
             linearOtherPeople.setVisibility(View.VISIBLE);
+            Log.d(TAG, "1111 "+ arrFriend.size());
             for (int i = 0; i < arrFriend.size(); i++){
                 if(iduserLogin.equals(arrFriend.get(i).getIdfriend().getId())){
-                    txtMess.setVisibility(View.VISIBLE);
+                    OtherPeopletxtMess.setVisibility(View.VISIBLE);
+                    Log.d(TAG, "1111 5 "+ arrFriend.get(i).getIdfriend().getId());
                     break;
                 }
             }
-            txtAddFriend.setVisibility(View.VISIBLE);
+            if(OtherPeopletxtMess.getVisibility() != View.VISIBLE){
+                OtherPeopleAdd.setVisibility(View.VISIBLE);
+            }
         }
 
     }
     @Override
     public void onClick(View v) {
+        Intent intent;
         switch (v.getId()){
             case R.id.txtPfStatus:
-                Intent intent = new Intent(PersonalActivity.this, UploadPostsActivity.class);
+                intent = new Intent(PersonalActivity.this, UploadPostsActivity.class);
                 startActivity(intent);
                 break;
             case R.id.linearPfShowImg:
                 sendArrImg();
                 break;
             case R.id.btnAddNewProfile:
-                Intent intent1 = new Intent(this, Personal_informationActivity.class);
-                intent1.putExtra("iduser",id);
-                startActivity(intent1);
+                intent = new Intent(this, Personal_informationActivity.class);
+                intent.putExtra("iduser",id);
+                intent.putExtra("action","addnew");
+                startActivity(intent);
                 break;
+            case R.id.ChangeAvata:
+                selectAvata();
+                break;
+            case R.id.ChangeCoverImage:
+                selectCoverImg();
+                break;
+            case R.id.btnEditProfile:
+                intent = new Intent(this,Personal_informationActivity.class);
+                putDataEdit(intent);
+                startActivity(intent);
+            case R.id.OtherPeopleAdd:
+                addFriend();
         }
     }
-
+    private void putDataEdit(Intent intent){
+        intent.putExtra("iduser",id);
+        intent.putExtra("username",username);
+        intent.putExtra("nickname",nickname);
+        intent.putExtra("phone",phone);
+        intent.putExtra("dateofbirth",dateofbirth);
+        intent.putExtra("studies",studies);
+        intent.putExtra("studied",studied);
+        intent.putExtra("placeslive",placeslive);
+        intent.putExtra("from",from);
+        intent.putExtra("job",job);
+        intent.putExtra("action","edit");
+    }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(resultCode == RESULT_OK){
+        if (resultCode == RESULT_OK && data != null && data != null){
+            if(requestCode == PICK_AVATA_REQUEST){
+                checkImg = false;
+                uri = data.getData();
+                realdPath = getPathFromURI(getApplicationContext(),uri);
+                Log.d(TAG, " haha "+realdPath);
+                Picasso.get().load(uri).resize(100,200).fit().centerCrop().into(circleImageViewAvata);
+                uploadImgProfile("avataprofile");
+            }
+            if(requestCode == PICK_COVERIMG_REQUEST){
+                checkImg = false;
+                uri = data.getData();
+                realdPath = getPathFromURI(getApplicationContext(),uri);
+                Log.d(TAG, " haha "+realdPath);
+                Picasso.get().load(uri).resize(400,200).fit().centerCrop().into(roundedImageViewCover);
+                uploadImgProfile("coverimgprofile");
+            }
+        }
+        if(resultCode == 100){
+            Log.d(TAG,"load lại đây");
             ReloadPage();
         }
+
     }
     private void ReloadPage(){
         Picasso.get().cancelRequest(circleImageViewAvata);
@@ -223,13 +357,15 @@ public class PersonalActivity extends AppCompatActivity implements View.OnClickL
         avata = intent.getStringExtra("avata");
         coverimage = intent.getStringExtra("coverimage");
         username = intent.getStringExtra("username");
+
         Log.d(TAG, " "+ id);
         sessionManagement = PersonalActivity.this.getSharedPreferences("userlogin",Context.MODE_PRIVATE);
         iduserLogin = sessionManagement.getString("id","");
     }
     private void setDataNotProfile(){
-        Picasso.get().load(BASE_URL+"uploads/"+avata).resize(200,200).into(circleImageViewAvata);
-        Picasso.get().load(BASE_URL+"uploads/"+coverimage).resize(400,200).into(roundedImageViewCover);
+        if(checkImg == true)
+            Picasso.get().load(BASE_URL+"uploads/"+avata).fit().centerCrop().into(circleImageViewAvata);
+        Picasso.get().load(BASE_URL+"uploads/"+coverimage).fit().centerCrop().into(roundedImageViewCover);
         txtUserNameProfile.setText(username);
     }
     private void getDataUser(){
@@ -269,35 +405,48 @@ public class PersonalActivity extends AppCompatActivity implements View.OnClickL
         avata = BASE_URL+"uploads/"+dataProfile.getUsers().getAvata();
         coverimage = BASE_URL+"uploads/"+dataProfile.getUsers().getCoverimage();
         username = dataProfile.getUsers().getUsername();
-        nickname = "("+dataProfile.getProfile().getNickname()+")";
-        Picasso.get().load(avata).resize(200,200).into(circleImageViewAvata);
-        Picasso.get().load(coverimage).resize(400,200).into(roundedImageViewCover);
+        nickname = dataProfile.getProfile().getNickname();
+        phone = dataProfile.getProfile().getPhone();
+        dateofbirth = dataProfile.getProfile().getDateofbirth();
+        studies = dataProfile.getEducation().getStudies_at();
+        studied = dataProfile.getEducation().getStudied_at();
+        placeslive = dataProfile.getPlaceslive();
+        from = dataProfile.getFrom();
+        job = dataProfile.getJob();
+        if(checkImg == true)
+            Picasso.get().load(avata).fit().centerCrop().into(circleImageViewAvata);
+        Picasso.get().load(coverimage).fit().centerCrop().into(roundedImageViewCover);
         txtUserNameProfile.setText(username);
-        txtNickName.setText(nickname);
+
         // thông tin
+        if(!dataProfile.getProfile().getNickname().equals("")){
+            txtNickName.setVisibility(View.VISIBLE);
+            String text = "("+nickname+")";
+            txtNickName.setText(text);
+        }
         if(!dataProfile.getJob().equals("")){
             linearProfileJob.setVisibility(View.VISIBLE);
-            String text = "Công việc <b>"+dataProfile.getJob()+"</b>";
+            String text = "Công việc <b>"+job+"</b>";
             txtJob.setText(Html.fromHtml(text));
         }
         if(!dataProfile.getEducation().getStudies_at().equals("")){
             linearProfileStudies.setVisibility(View.VISIBLE);
-            String text = "Học tại <b>"+dataProfile.getEducation().getStudies_at()+"</b>";
+            String text = "Học tại <b>"+studies+"</b>";
             txtStudies.setText(Html.fromHtml(text));
         }
         if(!dataProfile.getEducation().getStudied_at().equals("")){
             linearProfileStudied.setVisibility(View.VISIBLE);
-            String text = "Học tại <b>"+dataProfile.getEducation().getStudied_at()+"</b>";
+            String text = "Học tại <b>"+studied+"</b>";
             txtStudied.setText(Html.fromHtml(text));
         }
         if(!dataProfile.getFrom().equals("")){
             linearProfileFrom.setVisibility(View.VISIBLE);
-            String text = "Đến từ <b>"+dataProfile.getFrom()+"</b>";
+            String text = "Đến từ <b>"+from+"</b>";
             txtFrom.setText(Html.fromHtml(text));
         }
         if(!dataProfile.getPlaceslive().equals("")){
             linearProfilePlaceslive.setVisibility(View.VISIBLE);
-            String text = "Sống tại <b>"+dataProfile.getPlaceslive()+"</b>";
+            String text = "Sống tại <b>"+placeslive+"</b>";
             txtPlaceslive.setText(Html.fromHtml(text));
         }
     }
@@ -399,6 +548,7 @@ public class PersonalActivity extends AppCompatActivity implements View.OnClickL
         listCall.enqueue(new Callback<List<Friend>>() {
             @Override
             public void onResponse(Call<List<Friend>> call, Response<List<Friend>> response) {
+                Log.d(TAG, " "+ response);
                 if(!response.isSuccessful()){
                     Toast.makeText(PersonalActivity.this, "ko kết nối được", Toast.LENGTH_SHORT).show();
                     return;
@@ -437,8 +587,8 @@ public class PersonalActivity extends AppCompatActivity implements View.OnClickL
         listenerPosts = new postsAdapter.RecyclerviewClickListener() {
             @Override
             public void onClickComment(RelativeLayout btnComment, int position, int typeClick) {
-                CommentBottomSheetDialog commentBottomSheetDialog = new
-                        CommentBottomSheetDialog(arrayPosts.get(position).getId());
+                CommentBottomSheetDialog commentBottomSheetDialog =
+                        CommentBottomSheetDialog.newInstance(arrayPosts.get(position).getId());
                 commentBottomSheetDialog.show(getSupportFragmentManager(),
                         "add_photo_dialog_fragment");
             }
@@ -448,6 +598,24 @@ public class PersonalActivity extends AppCompatActivity implements View.OnClickL
                 DialogShowImageStatus dialogShowImageStatus = new DialogShowImageStatus(position, arrayPosts);
                 dialogShowImageStatus.show(getSupportFragmentManager(),"ShowImg_dialog_fragment");
             }
+
+            @Override
+            public void showStatusDetail(String idposts) {
+                Intent intent = new Intent(PersonalActivity.this, StatusDetailActivity.class);
+                intent.putExtra("idposts", idposts);
+                startActivity(intent);
+            }
+
+            @Override
+            public void personalUser(String iduser, int position) {
+
+            }
+
+            @Override
+            public void showIconStatus(RelativeLayout ejmotionLike, RecyclerView recyclerView, int position, Context context) {
+
+            }
+
         };
         mListenerFriend = new AdapterFriendPf.OnclickRecycelListener() {
             @Override
@@ -455,5 +623,176 @@ public class PersonalActivity extends AppCompatActivity implements View.OnClickL
                 Toast.makeText(PersonalActivity.this, ""+arrFriend.get(position).getIdfriend().getUsername(), Toast.LENGTH_SHORT).show();
             }
         };
+    }
+    private void selectAvata(){
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setType("image/*");
+        intent.setAction(intent.ACTION_GET_CONTENT);
+        startActivityForResult(intent.createChooser(intent,"Sellect file video"), PICK_AVATA_REQUEST);
+    }
+    private void selectCoverImg(){
+        Intent intent = new Intent(Intent.ACTION_PICK);
+        intent.setType("image/*");
+        intent.setAction(intent.ACTION_GET_CONTENT);
+        startActivityForResult(intent.createChooser(intent,"Sellect file video"), PICK_COVERIMG_REQUEST);
+    }
+    private void uploadImgProfile(String typeimg){
+        File file = new File(realdPath);
+        String file_path = file.getAbsolutePath();
+        Log.d(TAG, " "+ file_path);
+        RequestBody requestBody = RequestBody.create(file, MediaType.parse("multipart/form-data"));
+        MultipartBody.Part part = MultipartBody.Part.createFormData("image",file_path, requestBody);
+        Log.d(TAG," "+part);
+        profileRetrofit = retrofit.create(ProfileRetrofit.class);
+        Call<Error> errorCall = profileRetrofit.postImgProfile(id,typeimg,part);
+        errorCall.enqueue(new Callback<Error>() {
+            @Override
+            public void onResponse(Call<Error> call, Response<Error> response) {
+                Log.d(TAG, " "+response);
+                if(!response.isSuccessful()){
+                    Toast.makeText(PersonalActivity.this, "Fail", Toast.LENGTH_SHORT).show();
+                }else{
+                    Error errors = response.body();
+                    if(!errors.isSuccess()){
+                        Toast.makeText(PersonalActivity.this, "Posts Fail", Toast.LENGTH_SHORT).show();
+                    }
+                    else{
+                        Toast.makeText(PersonalActivity.this, "Posts new Success", Toast.LENGTH_SHORT).show();
+                        Log.d(TAG," "+errors);
+                        SharedPreferences.Editor editor = getSharedPreferences("userlogin", MODE_PRIVATE).edit();
+                        if(typeimg.equals("avataprofile")){
+                            editor.putString("avata",errors.getData());
+                        }
+                        else if(typeimg.equals("coverimgprofile")){
+                            editor.putString("coverimage", errors.getData());
+                        }
+                        editor.apply();
+                    }
+                }
+                call.cancel();
+            }
+
+            @Override
+            public void onFailure(Call<Error> call, Throwable t) {
+                Toast.makeText(PersonalActivity.this, "lỗi", Toast.LENGTH_SHORT).show();
+                Log.d("TAG", " "+t.getMessage());
+                call.cancel();
+            }
+        });
+    }
+    private void addFriend(){
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("iduserLogin", iduserLogin);
+            jsonObject.put("friend", id);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        socket.emit("add notication friend", jsonObject);
+        socket.on("add friend success", callbackAddfriend);
+    }
+    private Emitter.Listener callbackAddfriend = new Emitter.Listener() {
+        @Override
+        public void call(Object... args) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+
+                }
+            });
+        }
+    };
+    public static String getPathFromURI(final Context context, final Uri uri) {
+
+        final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
+
+        // DocumentProvider
+        if (isKitKat && DocumentsContract.isDocumentUri(context, uri)) {
+            // ExternalStorageProvider
+            if (isExternalStorageDocument(uri)) {
+                final String docId = DocumentsContract.getDocumentId(uri);
+                final String[] split = docId.split(":");
+                final String type = split[0];
+
+                if ("primary".equalsIgnoreCase(type)) {
+                    return Environment.getExternalStorageDirectory() + "/" + split[1];
+                }
+            }
+            // DownloadsProvider
+            else if (isDownloadsDocument(uri)) {
+
+                final String id = DocumentsContract.getDocumentId(uri);
+                final Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
+
+                return getDataColumn(context, contentUri, null, null);
+            }
+            // MediaProvider
+            else if (isMediaDocument(uri)) {
+                final String docId = DocumentsContract.getDocumentId(uri);
+                final String[] split = docId.split(":");
+                final String type = split[0];
+
+                Uri contentUri = null;
+                if ("image".equals(type)) {
+                    contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+                } else if ("video".equals(type)) {
+                    contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+                } else if ("audio".equals(type)) {
+                    contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+                }
+
+                final String selection = "_id=?";
+                final String[] selectionArgs = new String[] {
+                        split[1]
+                };
+
+                return getDataColumn(context, contentUri, selection, selectionArgs);
+            }
+        }
+        // MediaStore (and general)
+        else if ("content".equalsIgnoreCase(uri.getScheme())) {
+            return getDataColumn(context, uri, null, null);
+        }
+        // File
+        else if ("file".equalsIgnoreCase(uri.getScheme())) {
+            return uri.getPath();
+        }
+
+        return null;
+    }
+
+    public static String getDataColumn(Context context, Uri uri, String selection,
+                                       String[] selectionArgs) {
+
+        Cursor cursor = null;
+        final String column = "_data";
+        final String[] projection = {
+                column
+        };
+
+        try {
+            cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs,
+                    null);
+            if (cursor != null && cursor.moveToFirst()) {
+                final int column_index = cursor.getColumnIndexOrThrow(column);
+                return cursor.getString(column_index);
+            }
+        } finally {
+            if (cursor != null)
+                cursor.close();
+        }
+        return null;
+    }
+
+    public static boolean isExternalStorageDocument(Uri uri) {
+        return "com.android.externalstorage.documents".equals(uri.getAuthority());
+    }
+
+    public static boolean isDownloadsDocument(Uri uri) {
+        return "com.android.providers.downloads.documents".equals(uri.getAuthority());
+    }
+
+    public static boolean isMediaDocument(Uri uri) {
+        return "com.android.providers.media.documents".equals(uri.getAuthority());
     }
 }

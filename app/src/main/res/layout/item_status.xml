@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:paddingTop="20dp"
-    android:background="#CAC0C0">
+    android:background="#c9ccd1">
     <LinearLayout
+        android:id="@+id/linearStatus"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         android:background="#fff">
         <RelativeLayout
@@ -19,7 +20,7 @@
             android:paddingRight="10dp">
 
             <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/user"
+                android:id="@+id/Avatauser"
                 android:layout_width="45dp"
                 android:layout_height="45dp"
                 android:src="@drawable/user"/>
@@ -27,7 +28,7 @@
                 android:id="@+id/txtusername"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/user"
+                android:layout_toRightOf="@+id/Avatauser"
                 android:layout_marginLeft="10dp"
                 android:textColor="#000000"
                 android:textSize="18dp"
@@ -35,9 +36,10 @@
                 android:text="Thắng Nguyễn"
                 />
             <TextView
+                android:id="@+id/txtTimeUpload"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toRightOf="@+id/user"
+                android:layout_toRightOf="@+id/Avatauser"
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="5dp"
                 android:textSize="12dp"
@@ -147,7 +149,7 @@
                 android:id="@+id/iconLike"
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:src="@drawable/ic_facebook_blue_like_24"
+                android:src="@drawable/icon_like_facebook"
                 />
             <TextView
                 android:id="@+id/txtLike"
@@ -168,91 +170,159 @@
                 android:gravity="right"
                 />
         </RelativeLayout>
-        <ImageView
-            android:layout_margin="5dp"
-            android:layout_gravity="center"
-            android:layout_width="390dp"
-            android:layout_height="0.4dp"
-            android:background="#6E6464"/>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="5dp">
-            <RelativeLayout
-                android:id="@+id/btnLike"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="?android:attr/selectableItemBackground">
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:padding="2dp">
-                    <ImageView
-                        android:tag="like"
-                        android:id="@+id/imgbtnLike"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:adjustViewBounds="true"
-                        android:scaleType="fitCenter"
-                        android:src="@drawable/ic_facebook_like_24"/>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-medium"
-                        android:text=" Like"/>
-                </LinearLayout>
-            </RelativeLayout>
-            <RelativeLayout
-                android:id="@+id/btnComment"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="?android:attr/selectableItemBackground">
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:padding="2dp">
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:adjustViewBounds="true"
-                        android:scaleType="fitCenter"
-                        android:src="@drawable/ic_comments_24"/>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-medium"
-                        android:text=" Bình luận"/>
-                </LinearLayout>
-            </RelativeLayout>
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:background="?android:attr/selectableItemBackground">>
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:padding="2dp">
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:adjustViewBounds="true"
-                        android:scaleType="fitCenter"
-                        android:src="@drawable/ic_forward_arrow_24"/>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="sans-serif-medium"
-                        android:text=" Chia sẽ"/>
-                </LinearLayout>
-            </RelativeLayout>
-        </LinearLayout>
-    </LinearLayout>
+        <View
 
-</LinearLayout>
+            android:layout_gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="0.01dp"
+            android:background="#6E6464"/>
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/actionstatus"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal"
+        android:background="@color/white"
+        android:layout_below="@+id/linearStatus">
+
+        <RelativeLayout
+            android:id="@+id/btnLike"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackground">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerInParent="true"
+                android:gravity="center"
+                android:padding="2dp">
+
+                <ImageView
+                    android:id="@+id/imgbtnLike"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/icon_dislike"
+                    android:tag="like" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:text=" Like" />
+            </LinearLayout>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/btnComment"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackground">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerInParent="true"
+                android:gravity="center"
+                android:padding="2dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_comments_24" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:text=" Bình luận" />
+            </LinearLayout>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:background="?android:attr/selectableItemBackground">>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_centerInParent="true"
+                android:gravity="center"
+                android:padding="2dp">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_forward_arrow_24" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-medium"
+                    android:text=" Chia sẽ" />
+            </LinearLayout>
+        </RelativeLayout>
+    </LinearLayout>
+    <View
+        android:id="@+id/kakaka"
+        android:layout_below="@+id/actionstatus"
+        android:layout_width="match_parent"
+        android:layout_height="0.01dp"/>
+    <RelativeLayout
+        android:id="@+id/ejmotionLike"
+        android:visibility="gone"
+        android:layout_above="@+id/kakaka"
+        android:layout_width="match_parent"
+        android:layout_height="180dp"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp">
+        <RelativeLayout
+            android:layout_width="370dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="10dp">
+            <LinearLayout
+                android:layout_centerInParent="true"
+                android:id="@+id/linearbgrRecycler"
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:paddingRight="2dp"
+                android:background="@drawable/button_video_img_personal"
+                android:orientation="horizontal">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="68dp"
+                    android:background="@drawable/button_video_img_personal"
+                    android:backgroundTint="@color/white"
+                    android:orientation="horizontal">
+                </LinearLayout>
+            </LinearLayout>
+            <RelativeLayout
+                android:id="@+id/rltlayoutHideButton"
+                android:layout_marginTop="10dp"
+                android:layout_below="@+id/linearbgrRecycler"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:background="@color/white">
+            </RelativeLayout>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rcvIconStatus"
+                android:paddingLeft="4dp"
+                android:paddingTop="1dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </RelativeLayout>
+    </RelativeLayout>
+
+</RelativeLayout>

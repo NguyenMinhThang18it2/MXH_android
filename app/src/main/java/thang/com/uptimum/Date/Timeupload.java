@@ -8,21 +8,19 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-public class date {
-    public static void Datepost(String dtStart){
-        Log.d("aiasd", " "+ dtStart);
+public class Timeupload {
+    public String time(String dtStart){
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+        Date date = new Date();
+        long t = 0;
         try {
-            Date date = format.parse(dtStart);
+            date = format.parse(dtStart);
             long old = date.getTime();
             long now = System.currentTimeMillis();
-            long kq = now - old;
-            Log.d("123aweqwe", " "+ time(kq, date));
+            t = now - old;
         } catch (ParseException e) {
             e.printStackTrace();
         }
-    }
-    private static String time(long t, Date date){
         Date currentTime = Calendar.getInstance().getTime();
         int ycurrentTime = Integer.parseInt((String) DateFormat.format("yyyy", currentTime));
         int y = Integer.parseInt((String) DateFormat.format("yyyy", date));
@@ -42,7 +40,21 @@ public class date {
         else if(d>0) return d + " ngày";
         else if(h>0) return h + " h";
         else if(m>0) return m + " m";
-        else if(s>0) return "vừa xong";
+        else if(s>=0) return "vừa xong";
         else return null;
+    }
+    public long NumberTime(String dtStart){
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+        Date date = new Date();
+        long t = 0;
+        try {
+            date = format.parse(dtStart);
+            long old = date.getTime();
+            long now = System.currentTimeMillis();
+            t = now - old;
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return t;
     }
 }

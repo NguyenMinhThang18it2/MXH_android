@@ -41,7 +41,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:background="#CAC0C0"
+                android:background="#c9ccd1"
                 android:descendantFocusability="blocksDescendants">
 
                 <RelativeLayout
@@ -91,7 +91,6 @@
                                     xmlns:app="http://schemas.android.com/apk/res-auto"
                                     android:id="@+id/ImgstoriesUserLogin"
                                     android:layout_margin="30px"
-                                    android:src="@drawable/user"
                                     app:riv_border_width="0.1dip"
                                     app:riv_border_color="#333333"
                                     android:scaleType="centerCrop"
@@ -122,7 +121,7 @@
                                     android:textSize="14sp"
                                     android:fontFamily="sans-serif-medium"
                                     android:textColor="#FFF"
-                                    android:text="Minh Thắng"
+                                    android:text="Tạo tin mới"
                                     android:layout_marginTop="80dp"
                                     android:layout_marginLeft="-52dp"
                                     />
@@ -152,17 +151,22 @@
                             android:layout_marginLeft="20dp"
                             android:layout_marginRight="10dp"
                             android:layout_marginBottom="20dp"
-                            android:background="@drawable/button_see_all_story"
-                            android:gravity="center">
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:gravity="center_horizontal"
-                                android:text="Xem tất cả tin"
-                                android:textColor="@color/white"
-                                android:textSize="18sp"
-                                android:textStyle="bold" />
+                            android:background="@drawable/button_see_all_story">
+                            <LinearLayout
+                                android:id="@+id/linearShowAllStories"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:gravity="center"
+                                android:background="?android:attr/selectableItemBackground">
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center_horizontal"
+                                    android:text="Xem tất cả tin"
+                                    android:textColor="@color/white"
+                                    android:textSize="18sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
                         </LinearLayout>
                     </RelativeLayout>
                 </LinearLayout>

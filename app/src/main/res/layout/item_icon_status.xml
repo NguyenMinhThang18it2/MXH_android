@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    android:id="@+id/linearImgiconStatus"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_weight="1"
+    android:layout_width="wrap_content"
+    android:layout_height="182dp">
+    <ImageView
+        android:layout_above="@+id/rltImgiconStatus"
+        android:layout_weight="1"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:id="@+id/ImgiconStatus"
+        android:scaleType="centerCrop"/>
+    <RelativeLayout
+        android:id="@+id/rltImgiconStatus"
+        android:layout_alignParentBottom="true"
+        android:layout_width="48dp"
+        android:layout_height="70dp">
+        <View
+            android:layout_centerInParent="true"
+            android:layout_width="3dp"
+            android:layout_height="3dp"
+            android:background="#878787"/>
+    </RelativeLayout>
+</RelativeLayout>

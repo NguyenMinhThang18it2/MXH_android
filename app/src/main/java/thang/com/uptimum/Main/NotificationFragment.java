@@ -7,6 +7,7 @@ import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -27,6 +28,7 @@ import java.util.Collections;
 import static thang.com.uptimum.Socket.SocketIO.socket;
 
 import io.socket.emitter.Emitter;
+import thang.com.uptimum.Date.Timeupload;
 import thang.com.uptimum.R;
 import thang.com.uptimum.adapter.friendrequestAdapter;
 import thang.com.uptimum.adapter.notificationAdapter;
@@ -38,17 +40,24 @@ import thang.com.uptimum.model.ListNotification;
  */
 public class NotificationFragment extends Fragment {
     private View view;
-    private RecyclerView recyclerViewNotification, recyclerViewFriendReq;
-    private LinearLayoutManager linearLayoutManagerNotify, linearLayoutManagerFriendReq;
+    private RecyclerView recyclerViewNotification, recyclerViewFriendReq, recyclerviewNewNotification;
+    private LinearLayoutManager linearLayoutManagerNotify, linearLayoutManagerFriendReq, linearLayoutManagerNewNotify;
+    private SwipeRefreshLayout refreshNotification;
     // notification
     private ArrayList<ListNotification> listNotificationsArr;
     private notificationAdapter notificationAdapter;
     // friend reqest
     private ArrayList<ListNotification> listFriendReqArr;
     private friendrequestAdapter friendrequestAdapter;
+    //new Notification
+    private ArrayList<ListNotification> listNewNotify;
+
 
     private SharedPreferences sessionManagement ;
     private String iduser ;
+
+    private Timeupload timeupload;
+    private JSONObject iduserNotification;
     public NotificationFragment() {
         // Required empty public constructor
     }
@@ -59,27 +68,49 @@ public class NotificationFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view =  inflater.inflate(R.layout.fragment_notification, container, false);
-        recyclerViewNotification = (RecyclerView) view.findViewById(R.id.recyclerViewNotification);
-        recyclerViewFriendReq = (RecyclerView) view.findViewById(R.id.recyclerViewFriendReq);
-        recyclerViewFriendReq.setHasFixedSize(true);
-        recyclerViewNotification.setHasFixedSize(true);
-        linearLayoutManagerNotify =  new LinearLayoutManager
-                (getContext(), LinearLayoutManager.VERTICAL, false);
-        linearLayoutManagerFriendReq = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
-        recyclerViewNotification.setLayoutManager(linearLayoutManagerNotify);
-        recyclerViewFriendReq.setLayoutManager(linearLayoutManagerFriendReq);
 
-        listNotificationsArr = new ArrayList<>();
-        listFriendReqArr = new ArrayList<>();
+        timeupload = new Timeupload();
 
-        sessionManagement = getContext().getApplicationContext().getSharedPreferences("userlogin", Context.MODE_PRIVATE);
-        iduser = sessionManagement.getString("id","");
+        maping();
+        eventListener();
         getData();
         listenerUpdateData();
         return view;
     }
+    private void maping(){
+        refreshNotification = (SwipeRefreshLayout) view.findViewById(R.id.refreshNotification);
+        recyclerViewNotification = (RecyclerView) view.findViewById(R.id.recyclerViewNotification);
+        recyclerviewNewNotification = (RecyclerView) view.findViewById(R.id.recyclerviewNewNotification);
+        recyclerViewFriendReq = (RecyclerView) view.findViewById(R.id.recyclerViewFriendReq);
+        recyclerviewNewNotification.setHasFixedSize(true);
+        recyclerViewFriendReq.setHasFixedSize(true);
+        recyclerViewNotification.setHasFixedSize(true);
+        linearLayoutManagerNotify =  new LinearLayoutManager
+                (getContext(), LinearLayoutManager.VERTICAL, false);
+        linearLayoutManagerNewNotify = new LinearLayoutManager
+                (getContext(),LinearLayoutManager.VERTICAL,false);
+        linearLayoutManagerFriendReq = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
+        recyclerViewNotification.setLayoutManager(linearLayoutManagerNotify);
+        recyclerViewFriendReq.setLayoutManager(linearLayoutManagerFriendReq);
+        recyclerviewNewNotification.setLayoutManager(linearLayoutManagerNewNotify);
+
+        listNotificationsArr = new ArrayList<>();
+        listFriendReqArr = new ArrayList<>();
+        listNewNotify = new ArrayList<>();
+
+        sessionManagement = getContext().getApplicationContext().getSharedPreferences("userlogin", Context.MODE_PRIVATE);
+        iduser = sessionManagement.getString("id","");
+    }
+    private void eventListener(){
+        refreshNotification.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                socket.emit("get all notification", iduserNotification);
+            }
+        });
+    }
     private void getData(){
-        JSONObject iduserNotification = new JSONObject();
+        iduserNotification = new JSONObject();
         try {
             iduserNotification.put("iduser", iduser);
         } catch (JSONException e) {
@@ -91,25 +122,32 @@ public class NotificationFragment extends Fragment {
     private Emitter.Listener getdataNotification = new Emitter.Listener() {
         @Override
         public void call(Object... args) {
-            Handler handler = new Handler(Looper.getMainLooper());
-            handler.post(new Runnable() {
+            getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     JSONObject jsonObject = (JSONObject) args[0];
+                    listNewNotify.clear();
+                    listFriendReqArr.clear();
+                    listNotificationsArr.clear();
                     try {
                         JSONArray jsonArray = jsonObject.getJSONArray("listnotification");
                         if (jsonArray != null) {
-                            for (int i=0;i<jsonArray.length();i++){
+                            for (int i = 0; i < jsonArray.length(); i++) {
                                 JSONObject jsonObjectNotify = (JSONObject) jsonArray.get(i);
                                 Gson gson = new Gson();
                                 ListNotification notification = gson.fromJson(String.valueOf(jsonObjectNotify), ListNotification.class);
-                                if(notification.getTitle().equals("addfriend")){
+                                if (notification.getTitle().equals("addfriend")) {
                                     listFriendReqArr.add(notification);
-                                }else{
-                                    listNotificationsArr.add(notification);
+                                } else {
+                                    if (timeupload.NumberTime(notification.getCreateAt()) < 3600000) {
+                                        listNewNotify.add(notification);
+                                    } else {
+                                        listNotificationsArr.add(notification);
+                                    }
                                 }
                             }
                         }
+                        Collections.reverse(listNewNotify);
                         Collections.reverse(listNotificationsArr);
                         Collections.reverse(listFriendReqArr);
 
@@ -118,6 +156,9 @@ public class NotificationFragment extends Fragment {
 
                         friendrequestAdapter = new friendrequestAdapter(listFriendReqArr, getContext());
                         recyclerViewFriendReq.setAdapter(friendrequestAdapter);
+
+                        notificationAdapter = new notificationAdapter(listNewNotify, getContext());
+                        recyclerviewNewNotification.setAdapter(notificationAdapter);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -132,8 +173,8 @@ public class NotificationFragment extends Fragment {
     private Emitter.Listener listenerEvent = new Emitter.Listener() {
         @Override
         public void call(Object... args) {
-            Handler handler = new Handler(Looper.getMainLooper());
-            handler.post(new Runnable() {
+            Handler mHandler = new Handler(Looper.getMainLooper());
+            mHandler.post(new Runnable() {
                 @Override
                 public void run() {
                     JSONObject jsonObject = (JSONObject) args[0];
@@ -149,7 +190,7 @@ public class NotificationFragment extends Fragment {
                                     socket.emit("get update notification", Update);
                                 }
                             }
-                        }else if(action.equals("likeposts")){
+                        }else { //if(action.equals("likeposts"))
                             socket.emit("get update notification", Update);
                         }
                     } catch (JSONException e) {
@@ -162,26 +203,48 @@ public class NotificationFragment extends Fragment {
     private Emitter.Listener getListenerUpdateData = new Emitter.Listener() {
         @Override
         public void call(Object... args) {
-            Handler handler = new Handler(Looper.getMainLooper());
-            handler.post(new Runnable() {
+            getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     JSONObject jsonObject = (JSONObject) args[0];
+                    listNewNotify.clear();
+                    listFriendReqArr.clear();
+                    listNotificationsArr.clear();
                     try {
                         JSONArray jsonArray = jsonObject.getJSONArray("listnotification");
                         if (jsonArray != null) {
                             listNotificationsArr.clear();
-                            for (int i=0;i<jsonArray.length();i++){
+                            for (int i = 0; i < jsonArray.length(); i++) {
                                 JSONObject jsonObjectNotify = (JSONObject) jsonArray.get(i);
                                 Gson gson = new Gson();
                                 ListNotification notification = gson.fromJson(String.valueOf(jsonObjectNotify), ListNotification.class);
-                                listNotificationsArr.add(notification);
+                                if (notification.getTitle().equals("addfriend")) {
+                                    listFriendReqArr.add(notification);
+                                } else {
+                                    if (timeupload.NumberTime(notification.getCreateAt()) < 3600000) {
+                                        listNewNotify.add(notification);
+                                    } else {
+                                        listNotificationsArr.add(notification);
+                                    }
+                                }
                             }
                         }
+                        Collections.reverse(listNewNotify);
                         Collections.reverse(listNotificationsArr);
+                        Collections.reverse(listFriendReqArr);
+
                         notificationAdapter.notifyDataSetChanged();
+                        friendrequestAdapter.notifyDataSetChanged();
+                        notificationAdapter.notifyDataSetChanged();
+
                         notificationAdapter = new notificationAdapter(listNotificationsArr, getContext().getApplicationContext());
                         recyclerViewNotification.setAdapter(notificationAdapter);
+
+                        friendrequestAdapter = new friendrequestAdapter(listFriendReqArr, getContext());
+                        recyclerViewFriendReq.setAdapter(friendrequestAdapter);
+
+                        notificationAdapter = new notificationAdapter(listNewNotify, getContext());
+                        recyclerviewNewNotification.setAdapter(notificationAdapter);
                         Log.d("qưeqweqw123123e", " lấy xuống");
                     } catch (JSONException e) {
                         e.printStackTrace();

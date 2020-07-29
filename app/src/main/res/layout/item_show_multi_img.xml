@@ -19,7 +19,6 @@
                 android:scaleType="centerCrop"/>
         </LinearLayout>
         <RelativeLayout
-            android:layout_centerInParent="true"
             android:visibility="gone"
             android:id="@+id/rltloCountImg"
             android:layout_width="match_parent"

@@ -4,34 +4,34 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".splash.SplashActivity"
-    android:background="#fece2f">
+    tools:context=".splash.SplashActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_margin="20dp"
+        android:padding="20dp"
         android:orientation="vertical"
         android:layout_gravity="center">
         <ImageView
+            android:padding="50dp"
             android:id="@+id/splashimage"
             android:layout_width="wrap_content"
             android:layout_height="300dp"
             android:layout_gravity="center"
-            android:src="@drawable/splash"
+            android:src="@drawable/icon_main_app"
             android:layout_marginTop="100dp"
             />
+
         <TextView
             android:id="@+id/slogan"
+            android:layout_gravity="center"
+            android:fontFamily="sans-serif-medium"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Wellcome"
-            android:fontFamily="sans-serif-medium"
-            android:textStyle="bold"
+            android:text="Uptimum"
             android:textSize="60sp"
-            android:layout_gravity="center"
-            android:layout_marginTop="40dp"
-            />
-        </LinearLayout>
+            android:textStyle="bold"
+            android:textColor="#5476FF"/>
+    </LinearLayout>
 
 </LinearLayout>

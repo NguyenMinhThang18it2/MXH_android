@@ -27,4 +27,5 @@ public class StoriesViewpaerAdapter extends FragmentStateAdapter {
     public int getItemCount() {
         return fragments.size();
     }
+
 }

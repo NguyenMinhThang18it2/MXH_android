@@ -359,10 +359,14 @@ public class UploadPostsActivity extends AppCompatActivity implements View.OnCli
                     realPathfile = getPathFromURI(getApplicationContext(),uriAvata);
                     realPathfileArray.add(realPathfile);
                 }
-                if(realPathfileArray.size() > clipData.getItemCount()){ // khi khởi động lại thì nó tự thêm vào một cái path "/" nên phải xóa
-                    realPathfileArray.remove(0);
+                if(data.getClipData() != null) {
+                    if (realPathfileArray.size() > clipData.getItemCount()) // khi khởi động lại thì nó tự thêm vào một cái path "/" nên phải xóa
+                        realPathfileArray.remove(0);
                 }
-
+                else {
+                    if (realPathfileArray.size() > 1)
+                        realPathfileArray.remove(0);
+                }
                 showSelectMutilFile(uriArr);
                 menuUploadStatausMinimize.setVisibility(View.VISIBLE);
                 framevideo.setVisibility(View.GONE);

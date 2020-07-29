@@ -2,6 +2,7 @@ package thang.com.uptimum.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,7 +27,8 @@ import static thang.com.uptimum.util.Constants.BASE_URL;
 public class storyAdapter extends RecyclerView.Adapter<storyAdapter.ViewHolder> {
     ArrayList<Story> story;
     Context context;
-
+    private SharedPreferences sessionManagement;
+    private String iduser ;
     public storyAdapter(ArrayList<Story> story, Context context) {
         this.story = story;
         this.context = context;
@@ -42,16 +44,23 @@ public class storyAdapter extends RecyclerView.Adapter<storyAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull storyAdapter.ViewHolder holder, int position) {
+        sessionManagement = context.getApplicationContext().getSharedPreferences("userlogin",Context.MODE_PRIVATE);
+        iduser = sessionManagement.getString("id","");
+        if(story.get(position).getUsers().getId().equals(iduser)){
+            holder.txtUsername.setText("Tin của bạn");
+        }else{
+            holder.txtUsername.setText(story.get(position).getUsers().getUsername());
+        }
         Picasso.get().load(BASE_URL+"uploads/"+story.get(position).getFile()[0])
-                .memoryPolicy(MemoryPolicy.NO_CACHE).into(holder.imgStory);
+                .fit().centerCrop().memoryPolicy(MemoryPolicy.NO_CACHE).into(holder.imgStory);
         Picasso.get().load(BASE_URL+"uploads/"+story.get(position).getUsers().getAvata())
-                .memoryPolicy(MemoryPolicy.NO_CACHE).into(holder.imgUserStory);
-        holder.txtUsername.setText(story.get(position).getUsers().getUsername());
+                .fit().centerCrop().memoryPolicy(MemoryPolicy.NO_CACHE).into(holder.imgUserStory);
+
         holder.imgStory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context, ViewpagerStoriesActivity.class);
-                intent.putExtra("numberClickStory", position+1);
+                intent.putExtra("numberClickStory", position);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);
             }

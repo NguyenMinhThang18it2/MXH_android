@@ -20,6 +20,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import thang.com.uptimum.Date.Timeupload;
 import thang.com.uptimum.R;
 import thang.com.uptimum.model.Comment;
 
@@ -28,7 +29,7 @@ import static thang.com.uptimum.util.Constants.BASE_URL;
 public class commentAdapter extends RecyclerView.Adapter<commentAdapter.ViewHolder> {
     private ArrayList<Comment> cmt;
     private Context context;
-
+    private Timeupload date = new Timeupload();
     public commentAdapter(ArrayList<Comment> cmt, Context context) {
         this.cmt = cmt;
         this.context = context;
@@ -44,7 +45,8 @@ public class commentAdapter extends RecyclerView.Adapter<commentAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(@NonNull commentAdapter.ViewHolder holder, int position) {
-//        Picasso.get().load(BASE_URL+"uploads/"+cmt.get(position).getFile().getImage()).into(holder.avataUserCmt);
+        holder.txtTimeCmt.setText(date.time(cmt.get(position).getCreatedAt()));
+        Picasso.get().load(BASE_URL+"uploads/"+cmt.get(position).getIduser().getAvata()).resize(100,100).into(holder.avataUserCmt);
         holder.avataUserCmt.setAnimation(AnimationUtils.loadAnimation(context, R.anim.fade_transition_animation));
         holder.layoutComment.setAnimation(AnimationUtils.loadAnimation(context, R.anim.fade_scale_animation));
 
@@ -52,6 +54,10 @@ public class commentAdapter extends RecyclerView.Adapter<commentAdapter.ViewHold
         holder.txtUserCmt.setText(""+cmt.get(position).getDocument());
         holder.txtNumberLikeCmt.setText(""+cmt.get(position).getNumberLike().length);
         if(cmt.get(position).getFile().getImageComment().length()>10){
+            ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) holder.imgComment.getLayoutParams();
+            layoutParams.width = 600;
+            layoutParams.height = 350;
+            holder.imgComment.setLayoutParams(layoutParams);
             Picasso.get().load(BASE_URL+"uploads/"+cmt.get(position).getFile().getImageComment()).into(holder.imgComment);
         }
 //        holder.txtNumberLikeCmt.setText(cmt.get(position).getNumberLike().getTypeLike());

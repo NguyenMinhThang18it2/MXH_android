@@ -17,14 +17,17 @@ public class Posts {
     private UserLike[] like;
     @SerializedName("numberCmt")
     private String comment;
+    @SerializedName("createdAt")
+    private String createdAt;
 
-    public Posts(String id, Users iduser, String document, FileMxh file, UserLike[] like, String comment) {
+    public Posts(String id, Users iduser, String document, FileMxh file, UserLike[] like, String comment, String createdAt) {
         this.id = id;
         this.iduser = iduser;
         this.document = document;
         this.file = file;
         this.like = like;
         this.comment = comment;
+        this.createdAt = createdAt;
     }
 
     @Override
@@ -36,6 +39,7 @@ public class Posts {
                 ", file=" + file +
                 ", like=" + Arrays.toString(like) +
                 ", comment='" + comment + '\'' +
+                ", createdAt='" + createdAt + '\'' +
                 '}';
     }
 
@@ -85,5 +89,13 @@ public class Posts {
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public String getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(String createdAt) {
+        this.createdAt = createdAt;
     }
 }

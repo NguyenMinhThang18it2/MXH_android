@@ -24,6 +24,8 @@ import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -41,22 +43,35 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import io.socket.emitter.Emitter;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import thang.com.uptimum.Main.PersonalActivity;
 import thang.com.uptimum.R;
 import thang.com.uptimum.adapter.commentAdapter;
 import thang.com.uptimum.model.Comment;
+import thang.com.uptimum.model.Error;
+import thang.com.uptimum.network.NetworkUtil;
+import thang.com.uptimum.network.PostsRetrofit;
 
 import static android.app.Activity.RESULT_OK;
 import static thang.com.uptimum.Socket.SocketIO.socket;
 
 public class CommentBottomSheetDialog extends BottomSheetDialogFragment {
+    private final String TAG = "Comment";
     private View view;
     private BottomSheetBehavior bottomSheetBehavior;
     private RecyclerView recyclerViewCmt;
     private ArrayList<Comment> commentArrayList;
-    private thang.com.uptimum.adapter.commentAdapter commentAdapter;
+    private commentAdapter commentAdapter;
     private SharedPreferences sessionManagement ;
     private String iduser ;
     private String idPostsClick;
@@ -65,12 +80,20 @@ public class CommentBottomSheetDialog extends BottomSheetDialogFragment {
     private EditText documentCmt;
     private LinearLayoutManager linearLayoutManagerCmt;
     private RecyclerView recyclerViewCmtdialog;
-    private LinearLayout linearUploadImgCmt;
-    private static final int PICK_IMAGES_REQUEST = 123;
+    private RelativeLayout linearUploadImgCmt;
+    private LinearLayout btnCloseImgCmt;
+    private static final int PICK_IMAGESCMT_REQUEST = 221;
     private Uri uriAvata;
     private String realPathfile ="";
-    public CommentBottomSheetDialog(String idPostsClick) {
-        this.idPostsClick = idPostsClick;
+    private NetworkUtil networkUtil;
+    private Retrofit retrofit;
+    private JSONObject idcmtimg;
+    public static CommentBottomSheetDialog newInstance(String idPostsClick) {
+        CommentBottomSheetDialog commentBottomSheetDialog = new CommentBottomSheetDialog();
+        Bundle bundle = new Bundle();
+        bundle.putString("idPostsClick", idPostsClick);
+        commentBottomSheetDialog.setArguments(bundle);
+        return commentBottomSheetDialog;
     }
 
     @NonNull
@@ -81,19 +104,22 @@ public class CommentBottomSheetDialog extends BottomSheetDialogFragment {
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getContext(), R.style.BottomSheetDialogTheme);
         view = View.inflate(getContext(), R.layout.activity_comment, null);
         // join room cmt
+        idPostsClick = getArguments().getString("idPostsClick", "");
         socket.emit("join room cmt", idPostsClick);
         // view
+
         recyclerViewCmtdialog = (RecyclerView) view.findViewById(R.id.recyclerViewCmt);
         recyclerViewCmtdialog.setHasFixedSize(true);
         linearLayoutManagerCmt =  new LinearLayoutManager
                 (getContext(), LinearLayoutManager.VERTICAL, false);
         linearLayoutManagerCmt.setStackFromEnd(true);
 
-        linearUploadImgCmt = (LinearLayout) view.findViewById(R.id.linearUploadImgCmt);
+        btnCloseImgCmt = (LinearLayout) view.findViewById(R.id.btnCloseImgCmt);
+        linearUploadImgCmt = (RelativeLayout) view.findViewById(R.id.linearUploadImgCmt);
         UploadImgCmt = (RoundedImageView) view.findViewById(R.id.UploadImgCmt);
         recyclerViewCmtdialog.setLayoutManager(linearLayoutManagerCmt);
         recyclerViewCmt = recyclerViewCmtdialog;
-        btnBackUpload = (ImageView) view.findViewById(R.id.btnBackUpload);
+        btnBackUpload = (ImageView) view.findViewById(R.id.btnBackUploadCmt);
         documentCmt = (EditText) view.findViewById(R.id.documentCmt);
         sentCmt = (ImageView) view.findViewById(R.id.sentCmt);
         PostImgCmt = (ImageView) view.findViewById(R.id.PostImgCmt);
@@ -109,6 +135,13 @@ public class CommentBottomSheetDialog extends BottomSheetDialogFragment {
         commentArrayList = new ArrayList<>();
         getdataComment(idPostsClick);
         //comment
+        btnCloseImgCmt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                UploadImgCmt.setImageDrawable(null);
+                linearUploadImgCmt.setVisibility(View.GONE);
+            }
+        });
         sentCmt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -141,7 +174,7 @@ public class CommentBottomSheetDialog extends BottomSheetDialogFragment {
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK && data != null && data.getData() != null){
-            if(requestCode == PICK_IMAGES_REQUEST){
+            if(requestCode == PICK_IMAGESCMT_REQUEST){
                 uriAvata = data.getData();
                 realPathfile = getPathFromURI(getContext(),uriAvata);
                 linearUploadImgCmt.setVisibility(View.VISIBLE);
@@ -151,10 +184,10 @@ public class CommentBottomSheetDialog extends BottomSheetDialogFragment {
     }
 
     private void getfileUploadStatus(){
-        Intent intent = new Intent(Intent.ACTION_PICK);
+        Intent intent = new Intent(Intent.ACTION_PICK,null);
         intent.setType("image/*");
         intent.setAction(intent.ACTION_GET_CONTENT);
-        startActivityForResult(intent.createChooser(intent,"Sellect file img"), PICK_IMAGES_REQUEST);
+        startActivityForResult(intent, PICK_IMAGESCMT_REQUEST);
     }
     public static int getScreenHeight() {
         return Resources.getSystem().getDisplayMetrics().heightPixels;
@@ -229,14 +262,15 @@ public class CommentBottomSheetDialog extends BottomSheetDialogFragment {
                 @Override
                 public void run() {
                     JSONObject jsonObject = (JSONObject) args[0];
-                    JSONObject idpost = new JSONObject();
+                    idcmtimg = new JSONObject();
+                    String idabc = "";
                     try {
-                        String idabc = jsonObject.getString("id");
-                        idpost.put("id", idabc);
+                        idabc = jsonObject.getString("id");
+                        idcmtimg.put("id", idabc);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    socket.emit("id getcommentposts", idpost);
+                    uploadFileCmt(idabc);
                 }
             });
         }
@@ -273,7 +307,48 @@ public class CommentBottomSheetDialog extends BottomSheetDialogFragment {
         }
     };
 
+    private void uploadFileCmt(String idcmt){
+        Log.d(TAG,"haha  "+idcmt);
+        if(!realPathfile.isEmpty()){
+            File file = new File(realPathfile);
+            String file_path = file.getAbsolutePath();
+            Log.d(TAG, " "+ file_path);
+            RequestBody requestBody = RequestBody.create(file, MediaType.parse("multipart/form-data"));
+            MultipartBody.Part part = MultipartBody.Part.createFormData("image",file_path, requestBody);
+            networkUtil = new NetworkUtil();
+            retrofit = networkUtil.getRetrofit();
+            PostsRetrofit postsRetrofit = retrofit.create(PostsRetrofit.class);
+            Call<Error> errorCall = postsRetrofit.postFileCmt(idcmt, part);
+            errorCall.enqueue(new Callback<Error>() {
+                @Override
+                public void onResponse(Call<Error> call, Response<Error> response) {
+                    if(!response.isSuccessful()){
+                        Toast.makeText(getContext(), "Fail", Toast.LENGTH_SHORT).show();
+                    }else{
+                        Error errors = response.body();
+                        if(!errors.isSuccess()){
+                            Toast.makeText(getContext(), "Cmt Fail", Toast.LENGTH_SHORT).show();
+                        }
+                        else{
+                            Toast.makeText(getContext(), "Cmt new Success", Toast.LENGTH_SHORT).show();
+                            Log.d(TAG,"haha  "+errors.getMsg());
+                            socket.emit("id getcommentposts", idcmtimg);
+                        }
+                    }
+                    call.cancel();
+                }
 
+                @Override
+                public void onFailure(Call<Error> call, Throwable t) {
+                    Toast.makeText(getContext(), "lỗi", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG," "+t.getMessage());
+                    call.cancel();
+                }
+            });
+        }else{
+            socket.emit("id getcommentposts", idcmtimg);
+        }
+    }
 
 
     public static String getPathFromURI(final Context context, final Uri uri) {

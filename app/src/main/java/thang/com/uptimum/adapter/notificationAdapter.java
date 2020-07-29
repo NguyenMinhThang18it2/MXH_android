@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +21,7 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import thang.com.uptimum.Date.Timeupload;
 import thang.com.uptimum.R;
 import thang.com.uptimum.model.ListNotification;
 
@@ -28,7 +30,7 @@ import static thang.com.uptimum.util.Constants.BASE_URL;
 public class notificationAdapter extends RecyclerView.Adapter<notificationAdapter.ViewHolder> {
     private ArrayList<ListNotification> listNotifications;
     private Context context;
-
+    private Timeupload date = new Timeupload();
     public notificationAdapter(ArrayList<ListNotification> listNotifications, Context context) {
         this.listNotifications = listNotifications;
         this.context = context;
@@ -44,6 +46,7 @@ public class notificationAdapter extends RecyclerView.Adapter<notificationAdapte
 
     @Override
     public void onBindViewHolder(@NonNull notificationAdapter.ViewHolder holder, int position) {
+        holder.txtTimeNotify.setText(date.time(listNotifications.get(position).getCreateAt()));
         Picasso.get().load(BASE_URL+"uploads/"+listNotifications.get(position).getIduserNotify().getAvata()).into(holder.avataUserNotify);
         if(!listNotifications.get(position).isStatus()){
             // chưa xem
@@ -81,6 +84,12 @@ public class notificationAdapter extends RecyclerView.Adapter<notificationAdapte
         return listNotifications.size();
     }
 
+    @Override
+    public void onViewRecycled(@NonNull ViewHolder holder) {
+        super.onViewRecycled(holder);
+        holder.clear();
+    }
+
     public class ViewHolder extends RecyclerView.ViewHolder{
         private CircleImageView avataUserNotify, imgStatusNotify;
         private ImageView imgMenuNotify;
@@ -95,5 +104,12 @@ public class notificationAdapter extends RecyclerView.Adapter<notificationAdapte
             txtTimeNotify = (TextView) itemView.findViewById(R.id.txtTimeNotify);
             RelativeNotify = (RelativeLayout) itemView.findViewById(R.id.RelativeNotify);
         }
+        private void clear(){
+            Picasso.get().cancelRequest(avataUserNotify);
+            avataUserNotify.setImageDrawable(null);
+            Picasso.get().cancelRequest(imgStatusNotify);
+            imgStatusNotify.setImageDrawable(null);
+        }
     }
+
 }

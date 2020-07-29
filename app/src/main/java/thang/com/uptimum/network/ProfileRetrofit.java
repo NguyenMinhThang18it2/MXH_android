@@ -37,4 +37,19 @@ public interface ProfileRetrofit {
             @Field("from") String from,
             @Field("job") String job
     );
+
+    @POST("api/profileusername/{id}")
+    @FormUrlEncoded
+    Call<Error> postUserName(
+            @Path("id") String iduser,
+            @Field("username") String username
+    );
+
+    @Multipart
+    @POST("api/{type}/{id}")
+    Call<Error> postImgProfile(
+            @Path("id") String iduser,
+            @Path("type") String type,
+            @Part MultipartBody.Part upload
+    );
 }

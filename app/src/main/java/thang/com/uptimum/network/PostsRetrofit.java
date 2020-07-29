@@ -26,6 +26,10 @@ public interface PostsRetrofit {
             @Path("id") String iduser
     );
 
+    @GET("api/postsdetail/{id}")
+    Call<Posts> getPostsDetail(
+            @Path("id") String idposts
+    );
 
     @Multipart
     @POST("api/posts")
@@ -41,5 +45,12 @@ public interface PostsRetrofit {
             @Field("iduser") String iduser,
             @Field("document") String email,
             @Field("background") String background
+    );
+
+    @Multipart
+    @POST("api/comment/{id}")
+    Call<Error> postFileCmt(
+            @Path("id") String idcmt,
+            @Part MultipartBody.Part uploadfilecmt
     );
 }

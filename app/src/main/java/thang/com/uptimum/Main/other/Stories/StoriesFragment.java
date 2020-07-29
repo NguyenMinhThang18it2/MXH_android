@@ -11,11 +11,14 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import jp.shts.android.storiesprogressview.StoriesProgressView;
+import thang.com.uptimum.Date.Timeupload;
 import thang.com.uptimum.R;
 import thang.com.uptimum.model.Story;
 
@@ -31,7 +34,9 @@ public class StoriesFragment extends Fragment implements StoriesProgressView.Sto
     private ImageView imgStories, btnClose;
     private int counter = 0;
     private ArrayList<Story> arrayListStory;
-
+    private Timeupload date;
+    private TextView txtTimeStory, txtusername;
+    private CircleImageView userAvata;
 
     public StoriesFragment(ArrayList<Story> arrayListStory) {
         this.arrayListStory = arrayListStory;
@@ -42,10 +47,19 @@ public class StoriesFragment extends Fragment implements StoriesProgressView.Sto
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        date = new Timeupload();
         view = inflater.inflate(R.layout.fragment_stories, container, false);
         getActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         linearLayoutStory = (LinearLayout) view.findViewById(R.id.imgStoryhear);
+        txtTimeStory = (TextView) view.findViewById(R.id.txtTimeStory);
+        txtusername = (TextView) view.findViewById(R.id.txtusername);
+        userAvata = (CircleImageView) view.findViewById(R.id.userAvata);
+
+        txtTimeStory.setText(date.time(arrayListStory.get(0).getCreatedAt()));
+        txtusername.setText(arrayListStory.get(0).getUsers().getUsername());
+        Picasso.get().load(BASE_URL+"uploads/"+arrayListStory.get(0).getUsers().getAvata())
+                .resize(100,100).into(userAvata);
          // <- start progress
         imgStories = (ImageView) view.findViewById(R.id.imageStories);
         Picasso.get().load(BASE_URL+"uploads/"+arrayListStory.get(0).getFile()[counter]).into(imgStories);

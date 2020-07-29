@@ -84,7 +84,7 @@ public class VideoFragment extends Fragment {
                     }
                 }
                 Collections.reverse(arrayVideo);
-                adapterVideo = new videoAdapter(arrayVideo, getActivity().getApplicationContext());
+                adapterVideo = new videoAdapter(arrayVideo, getContext());
                 recyclerViewVideo.setAdapter(adapterVideo);
                 Log.d("arrvideo", " "+arrayVideo);
             }

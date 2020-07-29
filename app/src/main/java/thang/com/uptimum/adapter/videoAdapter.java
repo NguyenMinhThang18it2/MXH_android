@@ -55,6 +55,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import io.socket.emitter.Emitter;
+import thang.com.uptimum.Date.Timeupload;
 import thang.com.uptimum.R;
 import thang.com.uptimum.model.Comment;
 import thang.com.uptimum.model.Posts;
@@ -69,7 +70,7 @@ public class videoAdapter extends RecyclerView.Adapter<videoAdapter.ViewHolder>{
     public SimpleExoPlayer player;
     ArrayList<Posts> postsvideo;
     Context context;
-
+    private Timeupload date = new Timeupload();
     public videoAdapter(ArrayList<Posts> postsvideo, Context context) {
         this.postsvideo = postsvideo;
         this.context = context;
@@ -88,6 +89,7 @@ public class videoAdapter extends RecyclerView.Adapter<videoAdapter.ViewHolder>{
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        holder.txtTimeUpload.setText(date.time(postsvideo.get(position).getCreatedAt()));
         holder.imgStatus.setVisibility(View.GONE);
         holder.framevideo.setVisibility(View.VISIBLE);
         holder.txtName.setText((postsvideo.get(position).getIduser().getUsername()));
@@ -294,7 +296,7 @@ public class videoAdapter extends RecyclerView.Adapter<videoAdapter.ViewHolder>{
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{
-        private TextView txtName, txtDocument, txtLike, txtCmt;
+        private TextView txtName, txtDocument, txtLike, txtCmt, txtTimeUpload;
         private ImageView imgbtnLike, volume_controlview,exo_play,exo_pause,btnFullscreen, imgStatus;
         private RelativeLayout btnLike, btnComment;
         private PlayerView videoView;
@@ -304,6 +306,7 @@ public class videoAdapter extends RecyclerView.Adapter<videoAdapter.ViewHolder>{
 //        private ZoomInImageView ;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
+            txtTimeUpload = (TextView) itemView.findViewById(R.id.txtTimeUpload);
             rcvShowMultiImg = (RecyclerView) itemView.findViewById(R.id.rcvShowMultiImg);
             imgStatus = (ImageView) itemView.findViewById(R.id.imgStatus);
             txtName = (TextView) itemView.findViewById(R.id.txtusername);

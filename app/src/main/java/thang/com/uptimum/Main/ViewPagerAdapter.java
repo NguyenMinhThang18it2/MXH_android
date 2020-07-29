@@ -16,7 +16,8 @@ public class ViewPagerAdapter extends FragmentStateAdapter {
     public Fragment createFragment(int position) {
         switch (position){
             case 0:
-                return new HomeFragment();
+                HomeFragment homeFragment = HomeFragment.newInstance();
+                return homeFragment;
             case 1:
                 return new VideoFragment();
             case 2:

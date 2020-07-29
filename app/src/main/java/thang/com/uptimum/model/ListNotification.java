@@ -13,9 +13,9 @@ public class ListNotification {
     private boolean status;
     @SerializedName("title")
     private String title;
-    @SerializedName("createAt")
+    @SerializedName("createdAt")
     private String createAt;
-    @SerializedName("updateAt")
+    @SerializedName("updatedAt")
     private String updateAt;
 
     public ListNotification(Posts idPosts, String idStory, Users iduserNotify, boolean status, String title, String createAt, String updateAt) {

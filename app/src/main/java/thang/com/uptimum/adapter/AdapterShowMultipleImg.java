@@ -3,6 +3,7 @@ package thang.com.uptimum.adapter;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,6 +45,7 @@ public class AdapterShowMultipleImg extends RecyclerView.Adapter<AdapterShowMult
 
     @Override
     public void onBindViewHolder(@NonNull AdapterShowMultipleImg.Viewhoder holder, int position) {
+        Log.d("via", "1 "+UrlImg.get(position));
         LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -51,29 +53,31 @@ public class AdapterShowMultipleImg extends RecyclerView.Adapter<AdapterShowMult
         );
         switch (UrlImg.size()){
             case 1:
+                param.height = 1000;
+                holder.itemShowMultiImg.setLayoutParams(param);
                 Picasso.get().load(BASE_URL + "uploads/" + UrlImg.get(position))
-                        .resize(250,400).into(holder.itemShowMultiImg);
+                        .fit().centerCrop().into(holder.itemShowMultiImg);
                 break;
             case 2:
                 param.height = 1000 / 2;
                 holder.itemShowMultiImg.setLayoutParams(param);
                 Picasso.get().load(BASE_URL + "uploads/" + UrlImg.get(position))
-                        .resize(250,400).into(holder.itemShowMultiImg);
+                        .fit().centerCrop().into(holder.itemShowMultiImg);
                 break;
             case 3:
                 param.height = 1000 / 3;
                 holder.itemShowMultiImg.setLayoutParams(param);
                 Picasso.get().load(BASE_URL + "uploads/" + UrlImg.get(position))
-                        .resize(250,400).into(holder.itemShowMultiImg);
+                        .fit().centerCrop().into(holder.itemShowMultiImg);
                 break;
             default:
                 param.height = 1000 / 3;
                 holder.itemShowMultiImg.setLayoutParams(param);
                 Picasso.get().load(BASE_URL + "uploads/" + UrlImg.get(position))
-                        .resize(250,600).into(holder.itemShowMultiImg);
+                        .fit().centerCrop().into(holder.itemShowMultiImg);
                 if(position == 2){
                     holder.rltloCountImg.setVisibility(View.VISIBLE);
-                    int count = UrlImg.size() - 4;
+                    int count = UrlImg.size() - 3;
                     holder.txtCountImg.setText("+ "+count);
                 }
                 break;

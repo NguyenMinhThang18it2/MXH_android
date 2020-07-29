@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
+import androidx.annotation.Nullable;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -19,6 +20,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -38,8 +40,12 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import thang.com.uptimum.Dialog.CommentBottomSheetDialog;
 import thang.com.uptimum.Dialog.DialogShowImageStatus;
+import thang.com.uptimum.Main.other.StatusDetail.StatusDetailActivity;
+import thang.com.uptimum.Main.other.Stories.ShowAllStoriesActivity;
+import thang.com.uptimum.Main.other.Stories.UploadStoriesActivity;
 import thang.com.uptimum.Main.other.Stories.ViewpagerStoriesActivity;
 import thang.com.uptimum.R;
+import thang.com.uptimum.adapter.AdapterEjmotionLike;
 import thang.com.uptimum.adapter.postsAdapter;
 import thang.com.uptimum.adapter.storyAdapter;
 import thang.com.uptimum.model.Posts;
@@ -74,6 +80,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener , Com
     private postsAdapter adapterPosts;
     private storyAdapter adapterStory;
     private FrameLayout homeFragment;
+    private LinearLayout linearShowAllStories;
 
     private NetworkUtil networkUtil;
     private PostsRetrofit postsRetrofit;
@@ -89,12 +96,21 @@ public class HomeFragment extends Fragment implements View.OnClickListener , Com
     private String username = "";
     private int numberClickStory = 0;
 
+    private ArrayList<Integer> arrGif;
+
     private postsAdapter.RecyclerviewClickListener listener;
+    private AdapterEjmotionLike.onClickEjmotionStatus ejmotionListener;
 
 
 
-    public HomeFragment() {
+    public static HomeFragment newInstance(){
         // Required empty public constructor
+        return new HomeFragment();
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
     }
 
     @Override
@@ -103,6 +119,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener , Com
 //        // Inflate the layout for this fragment
         contactsview =  inflater.inflate(R.layout.fragment_home, container, false);
 //        // thêm tiếp nghe ba
+        linearShowAllStories = (LinearLayout) contactsview.findViewById(R.id.linearShowAllStories);
         homeFragment = (FrameLayout) contactsview.findViewById(R.id.homeFragment);
         nestedScrollView = (NestedScrollView) contactsview.findViewById(R.id.nestedScroolView);
         imguser = (CircleImageView) contactsview.findViewById(R.id.user);
@@ -136,7 +153,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener , Com
         getStory();
         getPosts();
         addDataUserlogin();
-
+        addEjmotion();
 
 
         return contactsview;
@@ -146,8 +163,11 @@ public class HomeFragment extends Fragment implements View.OnClickListener , Com
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        recyclerViewStory.setAdapter(null); // will trigger the recycling in the adapter
+        recyclerViewstatus.getRecycledViewPool().clear();
         recyclerViewstatus.setAdapter(null);
+        recyclerViewStory.getRecycledViewPool().clear();
+        recyclerViewStory.setAdapter(null);
+
     }
 
     public void freeMemory(){
@@ -164,9 +184,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener , Com
                 addNewStatus();
                 break;
             case R.id.ImgstoriesUserLogin:
-                Intent intent = new Intent(getActivity().getApplicationContext(), ViewpagerStoriesActivity.class);
+                Intent intent = new Intent(getActivity().getApplicationContext(), UploadStoriesActivity.class);
 //                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.putExtra("numberClickStory", 0);
                 startActivity(intent);
                 break;
             case R.id.user:
@@ -176,6 +195,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener , Com
                 personal.putExtra("coverimage", coverimage);
                 personal.putExtra("username",username);
                 startActivity(personal);
+                break;
+            case R.id.linearShowAllStories:
+                Intent intent1 = new Intent(getActivity().getApplicationContext(), ShowAllStoriesActivity.class);
+                startActivity(intent1);
                 break;
             default:
                 break;
@@ -187,14 +210,14 @@ public class HomeFragment extends Fragment implements View.OnClickListener , Com
             public void onRefresh() {
                 txtThongbao.setVisibility(View.GONE);
                 shimmerLayout.setVisibility(View.VISIBLE);
-                recyclerViewStory.setAdapter(null); // will trigger the recycling in the adapter
-                recyclerViewstatus.setAdapter(null);
                 getStory();
                 getPosts();
+                addDataUserlogin();
                 freeMemory();
                 swipe_refresh_layout.setRefreshing(false);
             }
         });
+        linearShowAllStories.setOnClickListener(this);
         txtstatus.setOnClickListener(this);
         ImgstoriesUserLogin.setOnClickListener(this);
         imguser.setOnClickListener(this);
@@ -214,7 +237,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener , Com
         username = sessionManagement.getString("username","");
         Log.d(TAG," "+id+avata+coverimage+username);
         //set thông tin
-        Picasso.get().load(BASE_URL+"uploads/"+avata).into(imguser);
+        Picasso.get().load(BASE_URL+"uploads/"+avata).into(ImgstoriesUserLogin);
+        Picasso.get().load(BASE_URL+"uploads/"+avata).resize(100,100).into(imguser);
         txtstatus.setHint(username+" đang nghĩ gì ?");
         socket.emit("chat message", id);
     }
@@ -236,12 +260,13 @@ public class HomeFragment extends Fragment implements View.OnClickListener , Com
                 List<Story> storys = response.body();
                 arrayStory.clear();
                 for(Story story : storys){
-                    if(story.getUsers().getId().equals(id)){ // lấy story userLogin để đầu mảng
-                        Picasso.get().load(BASE_URL+"uploads/"+story.getFile()[0]).into(ImgstoriesUserLogin);
-                        Picasso.get().load(BASE_URL+"uploads/"+story.getUsers().getAvata()).into(imgAvataUserLogin);
-                        Log.d("avataa", " "+story.getUsers().getAvata());
-                        txtUserNameLogin.setText(story.getUsers().getUsername());
-                    }else{
+                    if(story.getUsers().getId().equals(id)) { // lấy story userLogin để đầu mảng
+                        arrayStory.add(story);
+                        break;
+                    }
+                }
+                for(Story story : storys){
+                    if(!story.getUsers().getId().equals(id)){ // lấy story userLogin để đầu mảng
                         arrayStory.add(story);
                     }
                 }
@@ -280,7 +305,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener , Com
                 }
                 List<Posts> posts = response.body();
                 for(Posts post : posts){
-                    arrayPosts.add(post);
+                    if(post.getFile().getVideo().length()<10)
+                        arrayPosts.add(post);
                 }
 //                Collections.reverse(arrayPosts);
                 adapterPosts.notifyDataSetChanged();
@@ -302,8 +328,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener , Com
             public void onClickComment(RelativeLayout btnComment, int position, int typeClick) {
 
                     Log.d("kjqhwekwqe", " " + position);
-                    CommentBottomSheetDialog commentBottomSheetDialog = new
-                            CommentBottomSheetDialog(arrayPosts.get(position).getId());
+                    CommentBottomSheetDialog commentBottomSheetDialog =
+                            CommentBottomSheetDialog.newInstance(arrayPosts.get(position).getId());
                     commentBottomSheetDialog.show(getFragmentManager(),
                             "add_photo_dialog_fragment");
             }
@@ -312,9 +338,51 @@ public class HomeFragment extends Fragment implements View.OnClickListener , Com
                 DialogShowImageStatus dialogShowImageStatus = new DialogShowImageStatus(position, arrayPosts);
                 dialogShowImageStatus.show(getFragmentManager(),"ShowImg_dialog_fragment");
             }
+
+            @Override
+            public void showStatusDetail(String idposts) {
+                Log.d("StatusDetailActivity", "id "+ idposts);
+                Intent intent = new Intent(getContext().getApplicationContext(), StatusDetailActivity.class);
+                intent.putExtra("idposts", idposts);
+                startActivity(intent);
+            }
+
+            @Override
+            public void personalUser(String iduser, int position) {
+                Intent personal = new Intent(getActivity().getApplicationContext(), PersonalActivity.class);
+                personal.putExtra("iduser", iduser);
+                personal.putExtra("avata",arrayPosts.get(position).getIduser().getAvata());
+                personal.putExtra("coverimage", arrayPosts.get(position).getIduser().getCoverimage());
+                personal.putExtra("username",arrayPosts.get(position).getIduser().getUsername());
+                startActivity(personal);
+            }
+
+            @Override
+            public void showIconStatus(RelativeLayout ejmotionLike, RecyclerView recyclerView, int position, Context context) {
+                Log.d("nádasd","1 "+ arrGif);
+                recyclerView.setHasFixedSize(true);
+                recyclerView.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
+                AdapterEjmotionLike adapterEjmotionLike = new AdapterEjmotionLike(arrGif, context, ejmotionListener, nestedScrollView);
+                recyclerView.setAdapter(adapterEjmotionLike);
+            }
+        };
+        ejmotionListener = new AdapterEjmotionLike.onClickEjmotionStatus() {
+            @Override
+            public void onclick(int position) {
+                Toast.makeText(getContext(), " "+position, Toast.LENGTH_SHORT).show();
+            }
         };
     }
-
+    private void addEjmotion(){
+        arrGif = new ArrayList<>();
+        arrGif.add(R.drawable.ejmotionlike);
+        arrGif.add(R.drawable.ejmotionlove);
+        arrGif.add(R.drawable.ejmotionthuongthuong);
+        arrGif.add(R.drawable.ejmotionhahah);
+        arrGif.add(R.drawable.ejmotionwow);
+        arrGif.add(R.drawable.ejmotionsad);
+        arrGif.add(R.drawable.ejmotionphanno);
+    }
     @Override
     public void onTrimMemory(int level) {
         switch (level) {

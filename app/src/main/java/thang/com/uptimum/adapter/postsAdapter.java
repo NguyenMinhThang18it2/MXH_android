@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
@@ -12,8 +13,11 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -25,11 +29,12 @@ import android.widget.Toast;
 
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 
+import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayerFactory;
@@ -60,16 +65,17 @@ import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 //import com.zolad.zoominimageview.ZoomInImageView;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 
 import java.util.ArrayList;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import io.socket.emitter.Emitter;
-import thang.com.uptimum.Main.SwipeTouch.OnSwipeTouchListener;
+import thang.com.uptimum.Date.Timeupload;
 
+import thang.com.uptimum.Main.other.MyBounceInterpolator;
 import thang.com.uptimum.R;
 
 import thang.com.uptimum.model.Posts;
@@ -79,7 +85,7 @@ import static thang.com.uptimum.Socket.SocketIO.socket;
 import static thang.com.uptimum.util.Constants.BASE_URL;
 
 public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> {
-
+    private ArrayList<Integer> arrGif;
     private SimpleExoPlayer  player;
     private ArrayList<Posts> posts;
     private Context context;
@@ -89,6 +95,7 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
     private String iduser ;
 
     private RecyclerviewClickListener Listener;
+    private Timeupload date = new Timeupload();
 
     public postsAdapter(ArrayList<Posts> posts, Context context, RecyclerviewClickListener Listener) {
         this.posts = posts;
@@ -105,7 +112,9 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull postsAdapter.ViewHolder holder, int position) {
-
+        Picasso.get().load(BASE_URL+"uploads/"+posts.get(position).getIduser().getAvata())
+                .fit().centerCrop().into(holder.Avatauser);
+        holder.txtTimeUpload.setText(date.time(posts.get(position).getCreatedAt()));
         holder.txtName.setText((posts.get(position).getIduser().getUsername()));
         holder.txtLike.setText(""+posts.get(position).getLike().length);
         holder.txtCmt.setText(posts.get(position).getComment()+" Bình luận");
@@ -115,7 +124,7 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
         Log.d("ttahdsjahskjdas" , " "+iduser);
         for(int i = 0; i < posts.get(position).getLike().length; i++){
             if(iduser.equals(posts.get(position).getLike()[i].getIduserlike())){
-                holder.imgbtnLike.setImageResource(R.drawable.ic_facebook_blue_like_24);
+                holder.imgbtnLike.setImageResource(R.drawable.icon_like_facebook);
                 holder.imgbtnLike.setTag("dislike");
             }
         }
@@ -134,12 +143,16 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
                 }
                 socket.emit("Like posts to server", like);
                 if(likeTag.equals("like")){
-                    holder.imgbtnLike.setImageResource(R.drawable.ic_facebook_blue_like_24);
+                    final Animation animation =  AnimationUtils.loadAnimation(context,R.anim.bounce);
+                    MyBounceInterpolator myBounceInterpolator = new MyBounceInterpolator(100,10);
+                    animation.setInterpolator(myBounceInterpolator);
+                    holder.imgbtnLike.startAnimation(animation);
+                    holder.imgbtnLike.setImageResource(R.drawable.icon_like_facebook);
                     holder.imgbtnLike.setTag("dislike");
                     final MediaPlayer mediaPlayer = MediaPlayer.create(context, R.raw.like);
                     mediaPlayer.start();
                 }else if(likeTag.equals("dislike")){
-                    holder.imgbtnLike.setImageResource(R.drawable.ic_facebook_like_24);
+                    holder.imgbtnLike.setImageResource(R.drawable.icon_dislike);
                     holder.imgbtnLike.setTag("like");
                 }
             }
@@ -279,12 +292,12 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
 
                 @Override
                 public void onBitmapFailed(Exception e, Drawable errorDrawable) {
-                    Log.d("onBitmapFailed", " "+ e.getMessage());
+                    Log.d("onBitmapFailed", "faile "+ e.getMessage());
                 }
 
                 @Override
                 public void onPrepareLoad(Drawable placeHolderDrawable) {
-
+                    Log.d("onBitmapFailed", " đang load ");
                 }
             });
             String themesPosition = posts.get(position).getFile().getBackground();
@@ -294,60 +307,6 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
                 holder.textStatusBacground.setTextColor(Color.WHITE);
             }
         }
-//        holder.imgStatus.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-////                ((Activity) context).getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-//                AlertDialog.Builder builder = new AlertDialog.Builder(v.getRootView().getContext(), android.R.style.Theme_Black_NoTitleBar_Fullscreen);
-//                LayoutInflater layoutInflater = LayoutInflater.from(context);
-//
-//                LinearLayout tinShowImgDialog,buttonShowImgDialog;
-//                RelativeLayout menuShowImgDialog;
-//                TextView txtLikeDialog,usernamedialog;
-//
-//                View customView = layoutInflater.inflate(R.layout.show_img_status, null);
-//                ImageView imgdialog = (ImageView) customView.findViewById(R.id.imgdialog);
-//                usernamedialog = (TextView) customView.findViewById(R.id.usernamedialog);
-//                txtLikeDialog = (TextView) customView.findViewById(R.id.txtLikeDialog);
-//                menuShowImgDialog = (RelativeLayout) customView.findViewById(R.id.menuShowImgDialog);
-//                tinShowImgDialog = (LinearLayout) customView.findViewById(R.id.tinShowImgDialog);
-//                buttonShowImgDialog = (LinearLayout) customView.findViewById(R.id.buttonShowImgDialog);
-//                builder.setView(customView);
-//                tinShowImgDialog.setBackgroundResource(R.color.trans);
-//                Picasso.get().load(BASE_URL+"uploads/"+posts.get(position).getFile().getImage()[0]).into(imgdialog);
-//                usernamedialog.setText(posts.get(position).getIduser().getUsername());
-//                txtLikeDialog.setText(""+posts.get(position).getLike().length);
-//                AlertDialog alert = builder.create();
-//                alert.show();
-//                imgdialog.setOnTouchListener(new OnSwipeTouchListener(v.getRootView().getContext()){
-//                    public void onSwipeTop() {
-//                        alert.dismiss();
-//                    }
-//                    //                    public void onSwipeRight() {
-////                        Toast.makeText(MyActivity.this, "right", Toast.LENGTH_SHORT).show();
-////                    }
-////                    public void onSwipeLeft() {
-////                        Toast.makeText(MyActivity.this, "left", Toast.LENGTH_SHORT).show();
-////                    }
-//                    public void onSwipeBottom() {
-//                        alert.dismiss();
-//                    }
-//                    public void onSingleTap(){
-//                        if(!check){
-//                            menuShowImgDialog.animate().alpha(0.0f).setDuration(500);
-//                            tinShowImgDialog.animate().alpha(0.0f).setDuration(500);
-//                            buttonShowImgDialog.animate().alpha(0.0f).setDuration(500);
-//                            check = true;
-//                        }else{
-//                            menuShowImgDialog.animate().alpha(1.0f).setDuration(500);
-//                            tinShowImgDialog.animate().alpha(1.0f).setDuration(500);
-//                            buttonShowImgDialog.animate().alpha(1.0f).setDuration(500);
-//                            check = false;
-//                        }
-//                    }
-//                });
-//            }
-//        });
 
     }
 
@@ -362,17 +321,25 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
         holder.cleanup();
     }
 
-    public class ViewHolder  extends RecyclerView.ViewHolder implements View.OnClickListener{
-        private TextView txtName, txtDocument, txtLike, txtCmt, textStatusBacground;
+    public class ViewHolder  extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener{
+        private TextView txtName, txtDocument, txtLike, txtCmt, textStatusBacground, txtTimeUpload;
 //        private ZoomInImageView ;
         private ImageView imgbtnLike, volume_control,exo_play,exo_pause, imgStatus;
         private PlayerView videoView;
         private FrameLayout framevideo;
         private ProgressBar progressBar;
-        private RelativeLayout btnComment, btnLike;
-        private RecyclerView rcvShowMultiImg;
+        private RelativeLayout btnComment, btnLike, ejmotionLike, rltlayoutHideButton;
+        private RecyclerView rcvShowMultiImg, rcvIconStatus;
+        private CircleImageView Avatauser;
+        private LinearLayout linearStatus, linearbgrRecycler;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
+            rltlayoutHideButton = (RelativeLayout) itemView.findViewById(R.id.rltlayoutHideButton);
+            ejmotionLike = (RelativeLayout) itemView.findViewById(R.id.ejmotionLike);
+            rcvIconStatus = (RecyclerView) itemView.findViewById(R.id.rcvIconStatus);
+            linearStatus = (LinearLayout) itemView.findViewById(R.id.linearStatus);
+            Avatauser = (CircleImageView) itemView.findViewById(R.id.Avatauser);
+            txtTimeUpload = (TextView) itemView.findViewById(R.id.txtTimeUpload);
             rcvShowMultiImg = (RecyclerView) itemView.findViewById(R.id.rcvShowMultiImg);
             btnComment = (RelativeLayout) itemView.findViewById(R.id.btnComment);
             txtName = (TextView) itemView.findViewById(R.id.txtusername);
@@ -389,28 +356,48 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
             exo_play = (ImageView)    itemView.findViewById(R.id.exo_play);
             exo_pause = (ImageView) itemView.findViewById(R.id.exo_pause);
             progressBar = (ProgressBar) itemView.findViewById(R.id.progress_bar);
+            linearbgrRecycler = (LinearLayout) itemView.findViewById(R.id.linearbgrRecycler);
 
             volume_control.setOnClickListener(this);
             btnComment.setOnClickListener(this);
             imgStatus.setOnClickListener(this);
+            linearStatus.setOnClickListener(this);
+            Avatauser.setOnClickListener(this);
+
+            btnLike.setOnLongClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
-            switch (v.getId()){
-                case R.id.volume_control:
-                    turnOnOffVolume(volume_control);
-                    break;
-                case R.id.imgStatus:
-                    Listener.showImg(imgStatus ,getAdapterPosition(), 1);
-                    break;
-                case R.id.btnComment:
-                    Listener.onClickComment(btnComment, getAdapterPosition(), 2);
-                    break;
+            if(ejmotionLike.getVisibility() == View.VISIBLE){
+                ejmotionLike.setAnimation(AnimationUtils.loadAnimation(context, R.anim.hide_linear_ejmotion_status));
+                ejmotionLike.setVisibility(View.GONE);
+            }else {
+                switch (v.getId()) {
+                    case R.id.volume_control:
+                        turnOnOffVolume(volume_control);
+                        break;
+                    case R.id.imgStatus:
+                        Listener.showImg(imgStatus, getAdapterPosition(), 1);
+                        break;
+                    case R.id.btnComment:
+                        Listener.onClickComment(btnComment, getAdapterPosition(), 2);
+                        break;
+                    case R.id.linearStatus:
+                        Listener.showStatusDetail(posts.get(getAdapterPosition()).getId());
+                        break;
+                    case R.id.Avatauser:
+                        Listener.personalUser(posts.get(getAdapterPosition()).getIduser().getId(), getAdapterPosition());
+                        break;
+                    case R.id.txtusername:
+                        Listener.personalUser(posts.get(getAdapterPosition()).getIduser().getId(), getAdapterPosition());
+                        break;
+                }
             }
         }
         public void cleanup() {
             Picasso.get().cancelRequest(imgStatus);
+            Picasso.get().cancelRequest(Avatauser);
             Picasso.get().cancelRequest(new Target() {
                 @Override
                 public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
@@ -428,14 +415,30 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
                 }
             });
             imgStatus.setImageDrawable(null);
+            Avatauser.setImageDrawable(null);
+
             videoView.setPlayer(null);
-            player.release();
-            player.addVideoListener(null);
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            switch (v.getId()){
+                case R.id.btnLike:
+                    Listener.showIconStatus(btnLike, rcvIconStatus, getAdapterPosition(), context);
+                    ejmotionLike.setVisibility(View.VISIBLE);
+                    linearbgrRecycler.startAnimation(AnimationUtils.loadAnimation(context,R.anim.show_linear_ejmotion_status));
+                    rltlayoutHideButton.startAnimation(AnimationUtils.loadAnimation(context,R.anim.show_linear_ejmotion_status));
+                    break;
+            }
+            return true;
         }
     }
     public interface RecyclerviewClickListener{
         void onClickComment(RelativeLayout btnComment, int position, int typeClick);
         void showImg(ImageView imgShow, int position, int typeClick);
+        void showStatusDetail(String idposts);
+        void personalUser(String iduser, int position);
+        void showIconStatus(RelativeLayout ejmotionLike, RecyclerView recyclerView,int position, Context context);
     }
     private MediaSource buildMediaSource(Uri uri) {
         DataSource.Factory dataSourceFactory =
@@ -470,7 +473,7 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
         rcvImg.setLayoutManager(layoutManager);
         LinearLayout.LayoutParams param1 = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.MATCH_PARENT,
                 0
         );
         LinearLayout.LayoutParams param2 = new LinearLayout.LayoutParams(
@@ -479,19 +482,19 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
                 0
         );
         switch (ArrUrlImg.size()){
-            case 1:// px = dp * (dpi/160) lượm trên mạng =))
+            case 1:// px = dp * (dp/160) lượm trên mạng =))
                 param1.height = 1000;
                 param1.weight = 0;
                 mainImg.setLayoutParams(param1);
                 Picasso.get().load(BASE_URL + "uploads/" + ArrUrlImg.get(0))
-                        .memoryPolicy(MemoryPolicy.NO_CACHE).into(mainImg);
+                        .memoryPolicy(MemoryPolicy.NO_CACHE).fit().centerCrop().into(mainImg);
                 break;
             case 2:
                 param1.height = 1000;
                 param1.weight = 1;
                 mainImg.setLayoutParams(param1);
                 Picasso.get().load(BASE_URL + "uploads/" + ArrUrlImg.get(0))
-                        .memoryPolicy(MemoryPolicy.NO_CACHE).into(mainImg);
+                        .memoryPolicy(MemoryPolicy.NO_CACHE).fit().centerCrop().into(mainImg);
                 ArrUrlImg.remove(0);
                 Log.d("via"," "+ArrUrlImg);
                 rcvImg.setLayoutParams(param1);
@@ -503,7 +506,7 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
                 param1.weight = 1;
                 mainImg.setLayoutParams(param1);
                 Picasso.get().load(BASE_URL + "uploads/" + ArrUrlImg.get(0))
-                        .memoryPolicy(MemoryPolicy.NO_CACHE).into(mainImg);
+                        .memoryPolicy(MemoryPolicy.NO_CACHE).fit().centerCrop().into(mainImg);
                 ArrUrlImg.remove(0);
                 param2.height = 1000;
                 param2.weight = 2;

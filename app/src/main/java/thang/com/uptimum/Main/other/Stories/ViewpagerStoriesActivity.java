@@ -44,6 +44,7 @@ public class ViewpagerStoriesActivity extends AppCompatActivity {
         Log.d("storhjkl", " "+numberStory);
         networkUtil = new NetworkUtil();
         getStory();
+        viewPager2story.setPageTransformer(new CubeTransformerViewpager());
         viewPager2story.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position) {

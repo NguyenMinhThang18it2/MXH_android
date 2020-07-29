@@ -17,6 +17,7 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import thang.com.uptimum.Date.Timeupload;
 import thang.com.uptimum.R;
 import thang.com.uptimum.model.ListNotification;
 
@@ -25,7 +26,7 @@ import static thang.com.uptimum.util.Constants.BASE_URL;
 public class friendrequestAdapter extends RecyclerView.Adapter<friendrequestAdapter.ViewHolder>{
     private ArrayList<ListNotification> listFriendReq;
     private Context context;
-
+    private Timeupload date = new Timeupload();
     public friendrequestAdapter(ArrayList<ListNotification> listFriendReq, Context context) {
         this.listFriendReq = listFriendReq;
         this.context = context;
@@ -41,6 +42,7 @@ public class friendrequestAdapter extends RecyclerView.Adapter<friendrequestAdap
 
     @Override
     public void onBindViewHolder(@NonNull friendrequestAdapter.ViewHolder holder, int position) {
+        holder.txtTimeFriendReq.setText(date.time(listFriendReq.get(position).getCreateAt()));
         Picasso.get().load(BASE_URL+"uploads/"+listFriendReq.get(position).getIduserNotify().getAvata()).into(holder.avataFriendReq);
         String documentNotify = "<b>" + listFriendReq.get(position).getIduserNotify().getUsername() + "</b> "
                 +"<font color=#505050> đã gửi cho bạn lời mời kết bạn </font><b></b> ";

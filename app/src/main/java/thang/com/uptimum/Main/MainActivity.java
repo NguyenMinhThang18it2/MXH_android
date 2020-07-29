@@ -23,7 +23,6 @@ import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.gson.Gson;
-import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -39,7 +38,7 @@ import thang.com.uptimum.model.ListNotification;
 import static thang.com.uptimum.Socket.SocketIO.socket;
 
 public class MainActivity extends AppCompatActivity {
-    private ViewPager2 viewPager2;
+    public static ViewPager2 viewPager2;
     private TabLayout tabLayout;
     private TabLayoutMediator tabLayoutMediator;
     private BadgeDrawable badgeDrawable;
@@ -50,6 +49,10 @@ public class MainActivity extends AppCompatActivity {
     private SharedPreferences sessionManagement ;
     private String iduser ;
 
+    public static MainActivity newInstance() {
+
+        return new MainActivity();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                         break;
                     case 3:
-                        tab.setIcon(R.drawable.ic_person_add_black_24dp);
+                        tab.setIcon(R.drawable.icon_mess);
                         if(numberMess > 0){
                             badgeDrawable = tab.getOrCreateBadge();
                             badgeDrawable.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.colorAccent));
@@ -118,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                         break;
                     case 4:
-                        tab.setIcon(R.drawable.ic_person_black_24dp);
+                        tab.setIcon(R.drawable.ic_dehaze_black_24dp);
                         break;
                 }
             }
