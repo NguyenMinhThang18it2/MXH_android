@@ -24,7 +24,7 @@ import thang.com.uptimum.network.NetworkUtil;
 import thang.com.uptimum.network.StoryRetrofit;
 
 public class ViewpagerStoriesActivity extends AppCompatActivity {
-    public static ViewPager2 viewPager2story;
+    private ViewPager2 viewPager2story;
     private StoriesViewpaerAdapter storiesViewpaerAdapter;
 
     private StoryRetrofit storyRetrofit;
@@ -32,12 +32,13 @@ public class ViewpagerStoriesActivity extends AppCompatActivity {
     private Retrofit retrofit;
 
     private SharedPreferences sessionManagement;
-    private String id ="";
+    private String id ="", token = "";
     private int numberStory;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_viewpager_stories);
+
         viewPager2story = (ViewPager2) findViewById(R.id.storiesViewpager);
         Intent intent = getIntent();
         numberStory  = (int) intent.getSerializableExtra("numberClickStory");
@@ -56,10 +57,11 @@ public class ViewpagerStoriesActivity extends AppCompatActivity {
     private void getStory() {
         sessionManagement = ViewpagerStoriesActivity.this.getApplicationContext().getSharedPreferences("userlogin", Context.MODE_PRIVATE);
         id = sessionManagement.getString("id","");
+        token = "Bearer "+sessionManagement.getString("token","");
         List<Fragment> fragments = new ArrayList<>();
         retrofit = networkUtil.getRetrofit();
         storyRetrofit = retrofit.create(StoryRetrofit.class);
-        Call<List<Story>> callstory = storyRetrofit.getStory();
+        Call<List<Story>> callstory = storyRetrofit.getStory(token);
         callstory.enqueue(new Callback<List<Story>>() {
             @Override
             public void onResponse(Call<List<Story>> call, Response<List<Story>> response) {
@@ -73,7 +75,7 @@ public class ViewpagerStoriesActivity extends AppCompatActivity {
                     if(story.getUsers().getId().equals(id)){
                         ArrayList<Story> stories = new ArrayList<>();
                         stories.add(story);
-                        fragments.add(new StoriesFragment(stories));
+                        fragments.add(new StoriesFragment(stories, viewPager2story));
                         break;
                     }
                 }
@@ -81,7 +83,7 @@ public class ViewpagerStoriesActivity extends AppCompatActivity {
                     if(!story.getUsers().getId().equals(id)){
                         ArrayList<Story> stories = new ArrayList<>();
                         stories.add(story);
-                        fragments.add(new StoriesFragment(stories));
+                        fragments.add(new StoriesFragment(stories, viewPager2story));
                     }
                 }
 //                Collections.reverse(arrayStory);

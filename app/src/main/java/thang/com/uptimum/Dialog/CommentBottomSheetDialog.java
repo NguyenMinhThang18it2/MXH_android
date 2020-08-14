@@ -73,7 +73,7 @@ public class CommentBottomSheetDialog extends BottomSheetDialogFragment {
     private ArrayList<Comment> commentArrayList;
     private commentAdapter commentAdapter;
     private SharedPreferences sessionManagement ;
-    private String iduser ;
+    private String iduser, token ;
     private String idPostsClick;
     private ImageView btnBackUpload, sentCmt, PostImgCmt;
     private RoundedImageView UploadImgCmt;
@@ -101,6 +101,7 @@ public class CommentBottomSheetDialog extends BottomSheetDialogFragment {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         sessionManagement = getContext().getApplicationContext().getSharedPreferences("userlogin", Context.MODE_PRIVATE);
         iduser = sessionManagement.getString("id","");
+        token = "Bearer "+sessionManagement.getString("token","");
         BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(getContext(), R.style.BottomSheetDialogTheme);
         view = View.inflate(getContext(), R.layout.activity_comment, null);
         // join room cmt
@@ -318,7 +319,7 @@ public class CommentBottomSheetDialog extends BottomSheetDialogFragment {
             networkUtil = new NetworkUtil();
             retrofit = networkUtil.getRetrofit();
             PostsRetrofit postsRetrofit = retrofit.create(PostsRetrofit.class);
-            Call<Error> errorCall = postsRetrofit.postFileCmt(idcmt, part);
+            Call<Error> errorCall = postsRetrofit.postFileCmt(token, idcmt, part);
             errorCall.enqueue(new Callback<Error>() {
                 @Override
                 public void onResponse(Call<Error> call, Response<Error> response) {

@@ -90,7 +90,7 @@
                                 <com.makeramen.roundedimageview.RoundedImageView
                                     xmlns:app="http://schemas.android.com/apk/res-auto"
                                     android:id="@+id/ImgstoriesUserLogin"
-                                    android:layout_margin="30px"
+                                    android:layout_margin="10dp"
                                     app:riv_border_width="0.1dip"
                                     app:riv_border_color="#333333"
                                     android:scaleType="centerCrop"
@@ -134,6 +134,7 @@
                                     android:id="@+id/recyclerViewStory"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent"
+                                    android:paddingTop="5dp"
                                     />
                             </RelativeLayout>
 

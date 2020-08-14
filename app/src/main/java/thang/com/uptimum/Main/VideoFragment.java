@@ -1,5 +1,7 @@
 package thang.com.uptimum.Main;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -44,6 +46,8 @@ public class VideoFragment extends Fragment {
     private NetworkUtil networkUtil;
     private Retrofit retrofit;
     private PostsRetrofit postsRetrofit;
+    private SharedPreferences sharedPreferences;
+    private String token = "";
     public VideoFragment() {
         // Required empty public constructor
     }
@@ -64,12 +68,13 @@ public class VideoFragment extends Fragment {
         return viewVideo;
     }
     private void getPosts() {
-
+        sharedPreferences = getContext().getApplicationContext().getSharedPreferences("userlogin", Context.MODE_PRIVATE);
+        token = "Bearer "+sharedPreferences.getString("token","");
         arrayVideo = new ArrayList<>();
         retrofit = networkUtil.getRetrofit();
         postsRetrofit = retrofit.create(PostsRetrofit.class);
 
-        Call<List<Posts>> callposts = postsRetrofit.getPosts();
+        Call<List<Posts>> callposts = postsRetrofit.getPosts(token);
         callposts.enqueue(new Callback<List<Posts>>() {
             @Override
             public void onResponse(Call<List<Posts>> call, Response<List<Posts>> response) {

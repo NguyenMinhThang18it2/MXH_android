@@ -34,6 +34,7 @@
 
             </jp.shts.android.storiesprogressview.StoriesProgressView>
             <RelativeLayout
+                android:id="@+id/RelativeStoriesInfor"
                 android:layout_marginTop="10dp"
                 android:layout_below="@+id/stories"
                 android:layout_width="match_parent"
@@ -85,14 +86,45 @@
                 </RelativeLayout>
             </RelativeLayout>
             <LinearLayout
-                android:layout_marginTop="10dp"
-                android:layout_below="@+id/imgStoryhear"
+                android:id="@+id/linearStoriesBottom"
+                android:paddingTop="10dp"
+                android:layout_alignParentBottom="true"
                 android:layout_width="match_parent"
-                android:layout_height="60dp">
-
+                android:layout_height="70dp"
+                android:orientation="vertical">
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:fillViewport="true"
+                    android:scrollbars="none">
+                    <LinearLayout
+                        android:descendantFocusability="blocksDescendants"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:padding="10dp"
+                        android:orientation="horizontal">
+                        <EditText
+                            android:paddingLeft="20dp"
+                            android:layout_width="250dp"
+                            android:layout_height="match_parent"
+                            android:textStyle="bold"
+                            android:text="Trả lời Thắng..."
+                            android:textColor="@color/colorWhite"
+                            android:background="@drawable/edittextstories"/>
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent">
+                            <androidx.recyclerview.widget.RecyclerView
+                                android:id="@+id/reycStoriesEjmotion"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"/>
+                        </RelativeLayout>
+                    </LinearLayout>
+                </HorizontalScrollView>
             </LinearLayout>
         </RelativeLayout>
         <LinearLayout
+            android:id="@+id/linearPauseResume"
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="match_parent">

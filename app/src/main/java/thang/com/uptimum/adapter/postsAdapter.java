@@ -1,16 +1,27 @@
 package thang.com.uptimum.adapter;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Path;
 import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.transition.ChangeBounds;
+import android.transition.TransitionManager;
+import android.transition.TransitionSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -30,10 +41,14 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import androidx.annotation.Nullable;
 import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlaybackException;
@@ -60,11 +75,6 @@ import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 
-import com.squareup.picasso.MemoryPolicy;
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
-//import com.zolad.zoominimageview.ZoomInImageView;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -81,26 +91,32 @@ import thang.com.uptimum.R;
 import thang.com.uptimum.model.Posts;
 
 
+import static thang.com.uptimum.Main.MainActivity.viewPager2;
 import static thang.com.uptimum.Socket.SocketIO.socket;
 import static thang.com.uptimum.util.Constants.BASE_URL;
 
 public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> {
-    private ArrayList<Integer> arrGif;
     private SimpleExoPlayer  player;
     private ArrayList<Posts> posts;
     private Context context;
     boolean check = false;
+    private int currentPosition = 0;
+    private int typeAction = 0;
             //
     private SharedPreferences sessionManagement ;
     private String iduser ;
 
     private RecyclerviewClickListener Listener;
     private Timeupload date = new Timeupload();
+    private NestedScrollView nestedScrollView;
 
-    public postsAdapter(ArrayList<Posts> posts, Context context, RecyclerviewClickListener Listener) {
+    private float x,y;
+
+    public postsAdapter(ArrayList<Posts> posts, Context context, RecyclerviewClickListener Listener, NestedScrollView nestedScrollView) {
         this.posts = posts;
         this.context = context;
         this.Listener = Listener;
+        this.nestedScrollView = nestedScrollView;
     }
     @NonNull
     @Override
@@ -112,8 +128,8 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull postsAdapter.ViewHolder holder, int position) {
-        Picasso.get().load(BASE_URL+"uploads/"+posts.get(position).getIduser().getAvata())
-                .fit().centerCrop().into(holder.Avatauser);
+        Glide.with(context).load(BASE_URL+"uploads/"+posts.get(position).getIduser().getAvata())
+                .fitCenter().centerCrop().into(holder.Avatauser);
         holder.txtTimeUpload.setText(date.time(posts.get(position).getCreatedAt()));
         holder.txtName.setText((posts.get(position).getIduser().getUsername()));
         holder.txtLike.setText(""+posts.get(position).getLike().length);
@@ -180,7 +196,6 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
             }
         });
         // end like ------------------------------------------------------------------
-
         if(posts.get(position).getFile().getImage().length > 0) {
             holder.txtDocument.setText(posts.get(position).getDocument());
 
@@ -284,22 +299,18 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
             holder.framevideo.setVisibility(View.GONE);
             holder.textStatusBacground.setVisibility(View.VISIBLE);
             holder.textStatusBacground.setText(posts.get(position).getDocument());
-            Picasso.get().load(BASE_URL+"uploads/"+posts.get(position).getFile().getBackground()).into(new Target() {
-                @Override
-                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                    holder.textStatusBacground.setBackground(new BitmapDrawable(bitmap));
-                }
+            Glide.with(context).asBitmap().load(BASE_URL+"uploads/"+posts.get(position).getFile().getBackground())
+                    .into(new CustomTarget<Bitmap>() {
+                        @Override
+                        public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                            holder.textStatusBacground.setBackground(new BitmapDrawable(resource));
+                        }
 
-                @Override
-                public void onBitmapFailed(Exception e, Drawable errorDrawable) {
-                    Log.d("onBitmapFailed", "faile "+ e.getMessage());
-                }
+                        @Override
+                        public void onLoadCleared(@Nullable Drawable placeholder) {
 
-                @Override
-                public void onPrepareLoad(Drawable placeHolderDrawable) {
-                    Log.d("onBitmapFailed", " đang load ");
-                }
-            });
+                        }
+                    });
             String themesPosition = posts.get(position).getFile().getBackground();
             if(themesPosition.equals("theme-1591455100989-800497553.jpg")||themesPosition.equals("theme-1591455108514-450060551.jpg")||
                     themesPosition.equals("theme-1591455118097-266327722.jpg")||themesPosition.equals("theme-1591455433956-958748998.jpg")||
@@ -308,6 +319,50 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
             }
         }
 
+        for (int i = 0; i < holder.arrGif.size(); i++){
+            Glide.with(context)
+                    .load(holder.arrGif.get(i)).into(holder.arr.get(i));
+        }
+
+        holder.rlvEmotionReaction.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                holder.rlvEmotionReaction.onInterceptTouchEvent(event);
+                switch (event.getAction()){
+                    case MotionEvent.ACTION_DOWN:
+                        viewPager2.setUserInputEnabled(false);
+                        nestedScrollView.requestDisallowInterceptTouchEvent(true);
+                        // chọn ejmotion khi chạm lần đầu
+                        chooseEmotion(v,event,holder);
+                        break;
+                    case MotionEvent.ACTION_MOVE:
+                        viewPager2.setUserInputEnabled(false);
+                        nestedScrollView.requestDisallowInterceptTouchEvent(true);
+                        // chạm di chuyển
+                        holder.rectF = new RectF(v.getLeft(),v.getTop(),v.getRight(),v.getBottom());
+                        if(!holder.rectF.contains(v.getLeft() + (int) event.getX(), v.getTop() + (int) event.getY())){
+                            beforeAnimateNormalBack(holder);
+                        }else{
+                            chooseEmotion(v,event,holder);
+                        }
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        viewPager2.setUserInputEnabled(true);
+                        nestedScrollView.requestDisallowInterceptTouchEvent(false);
+                        // sau khi chọn ejmotion
+                        chooseAnimateNormalBack(holder);
+                        Log.d("abbcasd", "ACTION_UP " + event.getRawX()+ " "+event.getRawY());
+                        break;
+                    case MotionEvent.ACTION_CANCEL:
+                        viewPager2.setUserInputEnabled(true);
+                        nestedScrollView.requestDisallowInterceptTouchEvent(false);
+                        beforeAnimateNormalBack(holder);
+                        Log.d("abbcasd", "ACTION_CANCEL " + event.getRawX()+ " "+event.getRawY());
+                        break;
+                }
+                return true;
+            }
+        });
     }
 
     @Override
@@ -332,32 +387,23 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
         private RecyclerView rcvShowMultiImg, rcvIconStatus;
         private CircleImageView Avatauser;
         private LinearLayout linearStatus, linearbgrRecycler;
+        //Emoition
+        private RelativeLayout rlvEmotionReaction, rltemotionLike, rltemotionLove, rltemotionThuongThuong, rltemotionHaHa
+                ,rltemotionWow,rltemotionSad,rltemotionAngry, rtlBoardIn, rtlBoardOut, rltCoverEmotion, EmoitionStatus;
+        private ImageView emotionLike, emotionLove,emotionThuongThuong,emotionHaHa,emotionWow,emotionSad,emotionAngry;
+        private View viewEmotionLike, viewEmotionLove,viewEmotionThuongThuong,viewEmotionHaHa,viewEmotionWow,viewEmotionSad,viewEmotionAngry;
+        private RectF rectF, rectFLike, rectFLove, rectFThuong, rectFHaHa, rectFWow, rectFSad, rectFAngry;
+        private ArrayList<ImageView> arr;
+        private ArrayList<RectF> arrRectF;
+        private ArrayList<Integer> arrGif;
+        private ArrayList<View> arrView;
+        private ArrayList<RelativeLayout> arrRel;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            rltlayoutHideButton = (RelativeLayout) itemView.findViewById(R.id.rltlayoutHideButton);
-            ejmotionLike = (RelativeLayout) itemView.findViewById(R.id.ejmotionLike);
-            rcvIconStatus = (RecyclerView) itemView.findViewById(R.id.rcvIconStatus);
-            linearStatus = (LinearLayout) itemView.findViewById(R.id.linearStatus);
-            Avatauser = (CircleImageView) itemView.findViewById(R.id.Avatauser);
-            txtTimeUpload = (TextView) itemView.findViewById(R.id.txtTimeUpload);
-            rcvShowMultiImg = (RecyclerView) itemView.findViewById(R.id.rcvShowMultiImg);
-            btnComment = (RelativeLayout) itemView.findViewById(R.id.btnComment);
-            txtName = (TextView) itemView.findViewById(R.id.txtusername);
-            txtDocument = (TextView) itemView.findViewById(R.id.txtdocument);
-            txtLike = (TextView) itemView.findViewById(R.id.txtLike);
-            txtCmt = (TextView) itemView.findViewById(R.id.txtCmt);
-            textStatusBacground = (TextView) itemView.findViewById(R.id.textStatusBacground);
-            imgStatus = (ImageView) itemView.findViewById(R.id.imgStatus);
-            framevideo = (FrameLayout) itemView.findViewById(R.id.framevideo);
-            btnLike = (RelativeLayout) itemView.findViewById(R.id.btnLike);
-            imgbtnLike = (ImageView) itemView.findViewById(R.id.imgbtnLike);
-            videoView = (PlayerView) itemView.findViewById(R.id.videostatus);
-            volume_control = (ImageView) itemView.findViewById(R.id.volume_control);
-            exo_play = (ImageView)    itemView.findViewById(R.id.exo_play);
-            exo_pause = (ImageView) itemView.findViewById(R.id.exo_pause);
-            progressBar = (ProgressBar) itemView.findViewById(R.id.progress_bar);
-            linearbgrRecycler = (LinearLayout) itemView.findViewById(R.id.linearbgrRecycler);
-
+            mapingView(itemView);
+            mapingEmotion(itemView);
+            addArrEmotion();
+            loadEmotionGif();
             volume_control.setOnClickListener(this);
             btnComment.setOnClickListener(this);
             imgStatus.setOnClickListener(this);
@@ -369,9 +415,27 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
 
         @Override
         public void onClick(View v) {
-            if(ejmotionLike.getVisibility() == View.VISIBLE){
-                ejmotionLike.setAnimation(AnimationUtils.loadAnimation(context, R.anim.hide_linear_ejmotion_status));
-                ejmotionLike.setVisibility(View.GONE);
+            if(EmoitionStatus.getVisibility() == View.VISIBLE){
+//                ejmotionLike.setAnimation(AnimationUtils.loadAnimation(context, R.anim.hide_linear_ejmotion_status));
+
+
+                int duration = 100;
+
+                for (int i = 0; i < arrRel.size(); i++){
+                    Animation animation = AnimationUtils.loadAnimation(context, R.anim.hide_ejmotion_status);
+                    animation.setDuration(duration);
+                    arrRel.get(i).setAnimation(animation);
+                    arrRel.get(i).setVisibility(View.GONE);
+                    duration = duration + 100;
+                }
+                rtlBoardIn.setAnimation(AnimationUtils.loadAnimation(context, R.anim.hide_linear_ejmotion_status));
+                rtlBoardIn.setVisibility(View.GONE);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        EmoitionStatus.setVisibility(View.GONE);
+                    }
+                },500);
             }else {
                 switch (v.getId()) {
                     case R.id.volume_control:
@@ -396,49 +460,285 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
             }
         }
         public void cleanup() {
-            Picasso.get().cancelRequest(imgStatus);
-            Picasso.get().cancelRequest(Avatauser);
-            Picasso.get().cancelRequest(new Target() {
-                @Override
-                public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                    textStatusBacground.setBackground(null);
-                }
-
-                @Override
-                public void onBitmapFailed(Exception e, Drawable errorDrawable) {
-
-                }
-
-                @Override
-                public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-                }
-            });
+            Glide.with(context).clear(imgStatus);
+            Glide.with(context).clear(Avatauser);
+            Glide.with(context).clear(textStatusBacground);
+            textStatusBacground.setBackground(null);
             imgStatus.setImageDrawable(null);
             Avatauser.setImageDrawable(null);
 
             videoView.setPlayer(null);
         }
-
         @Override
         public boolean onLongClick(View v) {
             switch (v.getId()){
                 case R.id.btnLike:
-                    Listener.showIconStatus(btnLike, rcvIconStatus, getAdapterPosition(), context);
-                    ejmotionLike.setVisibility(View.VISIBLE);
-                    linearbgrRecycler.startAnimation(AnimationUtils.loadAnimation(context,R.anim.show_linear_ejmotion_status));
-                    rltlayoutHideButton.startAnimation(AnimationUtils.loadAnimation(context,R.anim.show_linear_ejmotion_status));
+                    EmoitionStatus.setVisibility(View.VISIBLE);
+                    int duration = 300;
+                    rtlBoardIn.setVisibility(View.VISIBLE);
+                    rtlBoardIn.setAnimation(AnimationUtils.loadAnimation(context, R.anim.show_ejmotion_status));
+                    for (int i = 0; i < arrRel.size(); i++){
+                        Animation animation = AnimationUtils.loadAnimation(context, R.anim.show_ejmotion_status);
+                        animation.setDuration(duration);
+                        arrRel.get(i).setAnimation(animation);
+                        arrRel.get(i).setVisibility(View.VISIBLE);
+                        duration = duration + 100;
+                    }
+                    break;
+                default:
                     break;
             }
             return true;
         }
+        //Touch Emotion
+        private void mapingView(View itemView){
+            linearStatus = (LinearLayout) itemView.findViewById(R.id.linearStatus);
+            Avatauser = (CircleImageView) itemView.findViewById(R.id.Avatauser);
+            txtTimeUpload = (TextView) itemView.findViewById(R.id.txtTimeUpload);
+            rcvShowMultiImg = (RecyclerView) itemView.findViewById(R.id.rcvShowMultiImg);
+            btnComment = (RelativeLayout) itemView.findViewById(R.id.btnComment);
+            txtName = (TextView) itemView.findViewById(R.id.txtusername);
+            txtDocument = (TextView) itemView.findViewById(R.id.txtdocument);
+            txtLike = (TextView) itemView.findViewById(R.id.txtLike);
+            txtCmt = (TextView) itemView.findViewById(R.id.txtCmt);
+            textStatusBacground = (TextView) itemView.findViewById(R.id.textStatusBacground);
+            imgStatus = (ImageView) itemView.findViewById(R.id.imgStatus);
+            framevideo = (FrameLayout) itemView.findViewById(R.id.framevideo);
+            btnLike = (RelativeLayout) itemView.findViewById(R.id.btnLike);
+            imgbtnLike = (ImageView) itemView.findViewById(R.id.imgbtnLike);
+            videoView = (PlayerView) itemView.findViewById(R.id.videostatus);
+            volume_control = (ImageView) itemView.findViewById(R.id.volume_control);
+            exo_play = (ImageView)    itemView.findViewById(R.id.exo_play);
+            exo_pause = (ImageView) itemView.findViewById(R.id.exo_pause);
+            progressBar = (ProgressBar) itemView.findViewById(R.id.progress_bar);
+        }
+        private void mapingEmotion(View itemView){
+            EmoitionStatus = (RelativeLayout) itemView.findViewById(R.id.EmoitionStatus);
+            rtlBoardIn = (RelativeLayout) itemView.findViewById(R.id.rtlBoardIn);
+            rtlBoardOut = (RelativeLayout) itemView.findViewById(R.id.rtlBoardOut);
+            rlvEmotionReaction = (RelativeLayout) itemView.findViewById(R.id.rlvEmotionReaction);
+            rltemotionLike = (RelativeLayout) itemView.findViewById(R.id.rltemotionLike);
+            rltemotionLove = (RelativeLayout) itemView.findViewById(R.id.rltemotionLove);
+            rltemotionThuongThuong = (RelativeLayout) itemView.findViewById(R.id.rltemotionThuongThuong);
+            rltemotionHaHa = (RelativeLayout) itemView.findViewById(R.id.rltemotionHaHa);
+            rltemotionWow = (RelativeLayout) itemView.findViewById(R.id.rltemotionWow);
+            rltemotionSad = (RelativeLayout) itemView.findViewById(R.id.rltemotionSad);
+            rltemotionAngry = (RelativeLayout) itemView.findViewById(R.id.rltemotionAngry);
+            //
+            emotionLike = (ImageView) itemView.findViewById(R.id.emotionLike);
+            emotionLove = (ImageView) itemView.findViewById(R.id.emotionLove);
+            emotionThuongThuong = (ImageView) itemView.findViewById(R.id.emotionThuongThuong);
+            emotionHaHa = (ImageView) itemView.findViewById(R.id.emotionHaHa);
+            emotionWow = (ImageView) itemView.findViewById(R.id.emotionWow);
+            emotionSad = (ImageView) itemView.findViewById(R.id.emotionSad);
+            emotionAngry = (ImageView) itemView.findViewById(R.id.emotionAngry);
+            rltCoverEmotion = (RelativeLayout) itemView.findViewById(R.id.rltCoverEmotion);
+            //
+            viewEmotionLike = (View) itemView.findViewById(R.id.viewEmotionLike);
+            viewEmotionLove = (View) itemView.findViewById(R.id.viewEmotionLove);
+            viewEmotionThuongThuong = (View) itemView.findViewById(R.id.viewEmotionThuong);
+            viewEmotionHaHa = (View) itemView.findViewById(R.id.viewEmotionHaHa);
+            viewEmotionWow = (View) itemView.findViewById(R.id.viewEmotionWow);
+            viewEmotionSad = (View) itemView.findViewById(R.id.viewEmotionSad);
+            viewEmotionAngry = (View) itemView.findViewById(R.id.viewEmotionAngry);
+        }
+        private void addArrEmotion(){
+            arr = new ArrayList<>();
+            arrRectF = new ArrayList<>();
+            arrView = new ArrayList<>();
+            arrRel = new ArrayList<>();
+            arr.clear();
+            arrRectF.clear();
+            arrView.clear();
+            arrRel.clear();
+            // add
+            arr.add(emotionLike);
+            arr.add(emotionLove);
+            arr.add(emotionThuongThuong);
+            arr.add(emotionHaHa);
+            arr.add(emotionWow);
+            arr.add(emotionSad);
+            arr.add(emotionAngry);
+
+            arrView.add(viewEmotionLike);
+            arrView.add(viewEmotionLove);
+            arrView.add(viewEmotionThuongThuong);
+            arrView.add(viewEmotionHaHa);
+            arrView.add(viewEmotionWow);
+            arrView.add(viewEmotionSad);
+            arrView.add(viewEmotionAngry);
+
+            arrRel.add(rltemotionLike);
+            arrRel.add(rltemotionLove);
+            arrRel.add(rltemotionThuongThuong);
+            arrRel.add(rltemotionHaHa);
+            arrRel.add(rltemotionWow);
+            arrRel.add(rltemotionSad);
+            arrRel.add(rltemotionAngry);
+        }
+        private void loadEmotionGif(){
+            arrGif = new ArrayList<>();
+            arrGif.clear();
+            arrGif.add(R.drawable.ejmotionlike);
+            arrGif.add(R.drawable.ejmotionlove);
+            arrGif.add(R.drawable.ejmotionthuongthuong);
+            arrGif.add(R.drawable.ejmotionhahah);
+            arrGif.add(R.drawable.ejmotionwow);
+            arrGif.add(R.drawable.ejmotionsad);
+            arrGif.add(R.drawable.ejmotionphanno);
+        }
+
     }
+    private void chooseEmotion(View v,MotionEvent  event, postsAdapter.ViewHolder holder){
+        holder.arrRectF.clear();
+        holder.rectFLike = new RectF(50+holder.rltemotionLike.getLeft(),v.getTop(),50+holder.rltemotionLike.getRight(),681+holder.rltemotionLike.getBottom());
+        holder.rectFLove = new RectF(50+holder.rltemotionLove.getLeft(),v.getTop(),50+holder.rltemotionLove.getRight(),681+holder.rltemotionLove.getBottom());
+        holder.rectFThuong = new RectF(50+holder.rltemotionThuongThuong.getLeft(),v.getTop(),50+holder.rltemotionThuongThuong.getRight(),681+holder.rltemotionThuongThuong.getBottom());
+        holder.rectFHaHa = new RectF(50+holder.rltemotionHaHa.getLeft(),v.getTop(),50+holder.rltemotionHaHa.getRight(),681+holder.rltemotionHaHa.getBottom());
+        holder.rectFWow = new RectF(50+holder.rltemotionWow.getLeft(),v.getTop(),50+holder.rltemotionWow.getRight(),681+holder.rltemotionWow.getBottom());
+        holder.rectFSad = new RectF(50+holder.rltemotionSad.getLeft(),v.getTop(),50+holder.rltemotionSad.getRight(),681+holder.rltemotionSad.getBottom());
+        holder.rectFAngry = new RectF(50+holder.rltemotionAngry.getLeft(),v.getTop(),50+holder.rltemotionAngry.getRight(),681+holder.rltemotionAngry.getBottom());
+
+        holder.arrRectF.add(holder.rectFLike);
+        holder.arrRectF.add(holder.rectFLove);
+        holder.arrRectF.add(holder.rectFThuong);
+        holder.arrRectF.add(holder.rectFHaHa);
+        holder.arrRectF.add(holder.rectFWow);
+        holder.arrRectF.add(holder.rectFSad);
+        holder.arrRectF.add(holder.rectFAngry);
+
+        Log.d("abbcasd", "arrF  " + holder.arrRectF.size());
+
+        for (int j = 0; j < holder.arrRectF.size(); j++){
+            if(holder.arrRectF.get(j).contains(v.getLeft() + (int) event.getX(), v.getTop() + (int) event.getY())){
+                selected(holder,j);
+
+                break;
+            }
+        }
+
+
+    }
+    private void selected(postsAdapter.ViewHolder holder, int position){
+        Log.d("abbcasd", "kết quả chọn  " + holder.arr.get(position));
+        if (currentPosition == position) return;
+
+        currentPosition = position;
+        typeAction = 1;
+        beforeAnimationChoosing(holder);
+    }
+    private int dpToPx(int dp) {
+        return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
+    }
+    private void beforeAnimationChoosing(postsAdapter.ViewHolder holder){
+        TransitionManager.beginDelayedTransition(holder.rtlBoardOut, new TransitionSet()
+                .addTransition(new ChangeBounds()).setDuration(400));
+
+        holder.rtlBoardIn.getLayoutParams().height = dpToPx(47);
+        holder.rtlBoardIn.requestLayout();
+        holder.rtlBoardOut.getLayoutParams().height = dpToPx(45);
+        holder.rtlBoardOut.requestLayout();
+        for (int i = 0; i < holder.arr.size(); i++ ){
+            if (i == currentPosition) {
+                TransitionManager.beginDelayedTransition(holder.arrRel.get(i), new TransitionSet()
+                        .addTransition(new ChangeBounds()).setDuration(400));
+                holder.arrRel.get(i).getLayoutParams().width = dpToPx(105);
+                holder.arrRel.get(i).requestLayout();
+                holder.arr.get(i).getLayoutParams().height = dpToPx(105);
+                holder.arr.get(i).getLayoutParams().width = dpToPx(105);
+                holder.arr.get(i).requestLayout();
+            } else {
+                TransitionManager.beginDelayedTransition(holder.arrRel.get(i), new TransitionSet()
+                        .addTransition(new ChangeBounds()).setDuration(400));
+                holder.arrRel.get(i).getLayoutParams().width = dpToPx(35);
+                holder.arrRel.get(i).requestLayout();
+                holder.arr.get(i).getLayoutParams().height = dpToPx(35);
+                holder.arr.get(i).getLayoutParams().width = dpToPx(35);
+                holder.arr.get(i).requestLayout();
+                holder.arrView.get(i).getLayoutParams().width = dpToPx(35);
+                holder.arrView.get(i).requestLayout();
+            }
+        }
+    }
+    private void  beforeAnimateNormalBack(postsAdapter.ViewHolder holder){
+        Log.d("typelike", " "+currentPosition);
+        TransitionManager.beginDelayedTransition(holder.rtlBoardIn, new TransitionSet()
+                .addTransition(new ChangeBounds()).setDuration(400));
+        holder.rtlBoardIn.getLayoutParams().height = dpToPx(57);
+        holder.rtlBoardIn.requestLayout();
+        holder.rtlBoardOut.getLayoutParams().height = dpToPx(55);
+        holder.rtlBoardOut.requestLayout();
+        for (int i = 0; i < holder.arr.size(); i++ ){
+            TransitionManager.beginDelayedTransition(holder.arrRel.get(i), new TransitionSet()
+                    .addTransition(new ChangeBounds()).setDuration(400));
+            holder.arrRel.get(i).getLayoutParams().width = dpToPx(45);
+            holder.arrRel.get(i).requestLayout();
+            holder.arr.get(i).getLayoutParams().height = dpToPx(45);
+            holder.arr.get(i).getLayoutParams().width = dpToPx(45);
+            holder.arr.get(i).requestLayout();
+        }
+    }
+    private void chooseAnimateNormalBack(postsAdapter.ViewHolder holder){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            x = holder.arrRel.get(currentPosition).getX();
+            y = holder.arrRel.get(currentPosition).getY();
+            Path path = new Path();
+            path.arcTo(-120f, -180f, holder.arrRel.get(currentPosition).getRight()-dpToPx(60), 1080f, -45f, -135f, false);
+            path.setLastPoint(-70f, 80f);
+            ObjectAnimator animator = ObjectAnimator.ofFloat(holder.arrRel.get(currentPosition), View.X, View.Y, path);
+            AnimatorSet animatorSet = new AnimatorSet();
+            ObjectAnimator scaleY = ObjectAnimator.ofFloat(holder.arrRel.get(currentPosition), "scaleY", 1f, 0.1f);
+            ObjectAnimator scaleX = ObjectAnimator.ofFloat(holder.arrRel.get(currentPosition), "scaleX", 1f, 0.1f);
+            animatorSet.playTogether(scaleX, scaleY, animator);
+            animatorSet.setDuration(1000);
+            animatorSet.start();
+            animator.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+
+                    animation.removeListener(this);
+                    animation.setDuration(0);
+                    ((ObjectAnimator) animation).reverse();
+                    // trở về size và vị trí ban đầu
+                    holder.arrRel.get(currentPosition).setScaleX(1f);
+                    holder.arrRel.get(currentPosition).setScaleY(1f);
+                    path.lineTo(x,y);
+                    ObjectAnimator animator = ObjectAnimator.ofFloat(holder.arrRel.get(currentPosition), View.X, View.Y, path);
+                    animator.setDuration(0);
+                    animator.start();
+                    // tất cả trở về size ban đầu
+                    beforeAnimateNormalBack(holder);
+                }
+            });
+        } else {
+            // Create animator without using curved path
+        }
+        int duration = 100;
+
+        for (int i = 0; i < holder.arrRel.size(); i++){
+            if(i != currentPosition) {
+                Animation animation = AnimationUtils.loadAnimation(context, R.anim.hide_ejmotion_status);
+                animation.setDuration(duration);
+                holder.arrRel.get(i).setAnimation(animation);
+                holder.arrRel.get(i).setVisibility(View.INVISIBLE);
+                duration = duration + 100;
+            }
+        }
+        holder.rtlBoardIn.setAnimation(AnimationUtils.loadAnimation(context, R.anim.hide_linear_ejmotion_status));
+        holder.rtlBoardIn.setVisibility(View.GONE);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                holder.EmoitionStatus.setVisibility(View.INVISIBLE);
+            }
+        },900);
+    }
+
     public interface RecyclerviewClickListener{
         void onClickComment(RelativeLayout btnComment, int position, int typeClick);
         void showImg(ImageView imgShow, int position, int typeClick);
         void showStatusDetail(String idposts);
         void personalUser(String iduser, int position);
-        void showIconStatus(RelativeLayout ejmotionLike, RecyclerView recyclerView,int position, Context context);
     }
     private MediaSource buildMediaSource(Uri uri) {
         DataSource.Factory dataSourceFactory =
@@ -486,15 +786,15 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
                 param1.height = 1000;
                 param1.weight = 0;
                 mainImg.setLayoutParams(param1);
-                Picasso.get().load(BASE_URL + "uploads/" + ArrUrlImg.get(0))
-                        .memoryPolicy(MemoryPolicy.NO_CACHE).fit().centerCrop().into(mainImg);
+                Glide.with(context).load(BASE_URL + "uploads/" + ArrUrlImg.get(0))
+                        .fitCenter().centerCrop().into(mainImg);
                 break;
             case 2:
                 param1.height = 1000;
                 param1.weight = 1;
                 mainImg.setLayoutParams(param1);
-                Picasso.get().load(BASE_URL + "uploads/" + ArrUrlImg.get(0))
-                        .memoryPolicy(MemoryPolicy.NO_CACHE).fit().centerCrop().into(mainImg);
+                Glide.with(context).load(BASE_URL + "uploads/" + ArrUrlImg.get(0))
+                        .fitCenter().centerCrop().into(mainImg);
                 ArrUrlImg.remove(0);
                 Log.d("via"," "+ArrUrlImg);
                 rcvImg.setLayoutParams(param1);
@@ -505,8 +805,8 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
                 param1.height = 1000;
                 param1.weight = 1;
                 mainImg.setLayoutParams(param1);
-                Picasso.get().load(BASE_URL + "uploads/" + ArrUrlImg.get(0))
-                        .memoryPolicy(MemoryPolicy.NO_CACHE).fit().centerCrop().into(mainImg);
+                Glide.with(context).load(BASE_URL + "uploads/" + ArrUrlImg.get(0))
+                        .fitCenter().centerCrop().into(mainImg);
                 ArrUrlImg.remove(0);
                 param2.height = 1000;
                 param2.weight = 2;

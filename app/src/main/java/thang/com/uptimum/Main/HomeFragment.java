@@ -1,7 +1,9 @@
 package thang.com.uptimum.Main;
 
+import android.app.AlertDialog;
 import android.content.ComponentCallbacks2;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -43,11 +45,11 @@ import thang.com.uptimum.Dialog.DialogShowImageStatus;
 import thang.com.uptimum.Main.other.StatusDetail.StatusDetailActivity;
 import thang.com.uptimum.Main.other.Stories.ShowAllStoriesActivity;
 import thang.com.uptimum.Main.other.Stories.UploadStoriesActivity;
-import thang.com.uptimum.Main.other.Stories.ViewpagerStoriesActivity;
 import thang.com.uptimum.R;
-import thang.com.uptimum.adapter.AdapterEjmotionLike;
 import thang.com.uptimum.adapter.postsAdapter;
 import thang.com.uptimum.adapter.storyAdapter;
+import thang.com.uptimum.login.LoginActivity;
+import thang.com.uptimum.login.SessionManagement;
 import thang.com.uptimum.model.Posts;
 import thang.com.uptimum.model.Story;
 import thang.com.uptimum.network.NetworkUtil;
@@ -94,13 +96,12 @@ public class HomeFragment extends Fragment implements View.OnClickListener , Com
     private String avata = "";
     private String coverimage = "";
     private String username = "";
+    private String token = "";
     private int numberClickStory = 0;
 
     private ArrayList<Integer> arrGif;
 
     private postsAdapter.RecyclerviewClickListener listener;
-    private AdapterEjmotionLike.onClickEjmotionStatus ejmotionListener;
-
 
 
     public static HomeFragment newInstance(){
@@ -150,9 +151,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener , Com
         retrofit = networkUtil.getRetrofit();
         addEvents();
         setOnClickListener();
+        addDataUserlogin();
         getStory();
         getPosts();
-        addDataUserlogin();
         addEjmotion();
 
 
@@ -235,7 +236,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener , Com
         avata = sessionManagement.getString("avata", "");
         coverimage = sessionManagement.getString("coverimage", "");
         username = sessionManagement.getString("username","");
-        Log.d(TAG," "+id+avata+coverimage+username);
+        token = "Bearer "+sessionManagement.getString("token","");
+        Log.d(TAG," "+id+avata+coverimage+username+token);
         //set thông tin
         Picasso.get().load(BASE_URL+"uploads/"+avata).into(ImgstoriesUserLogin);
         Picasso.get().load(BASE_URL+"uploads/"+avata).resize(100,100).into(imguser);
@@ -249,28 +251,29 @@ public class HomeFragment extends Fragment implements View.OnClickListener , Com
         shimmerLayout.startShimmerAnimation();
         arrayStory.clear();
         storyRetrofit = retrofit.create(StoryRetrofit.class);
-        Call<List<Story>> callstory = storyRetrofit.getStory();
+        Call<List<Story>> callstory = storyRetrofit.getStory(token);
         callstory.enqueue(new Callback<List<Story>>() {
             @Override
             public void onResponse(Call<List<Story>> call, Response<List<Story>> response) {
                 if(!response.isSuccessful()){
                     Toast.makeText(getContext(), "lỗi rác story", Toast.LENGTH_SHORT).show();
                     return;
-                }
-                List<Story> storys = response.body();
-                arrayStory.clear();
-                for(Story story : storys){
-                    if(story.getUsers().getId().equals(id)) { // lấy story userLogin để đầu mảng
-                        arrayStory.add(story);
-                        break;
+                }else{
+                    List<Story> storys = response.body();
+                    arrayStory.clear();
+                    for(Story story : storys){
+                        if(story.getUsers().getId().equals(id)) { // lấy story userLogin để đầu mảng
+                            arrayStory.add(story);
+                            break;
+                        }
                     }
-                }
-                for(Story story : storys){
-                    if(!story.getUsers().getId().equals(id)){ // lấy story userLogin để đầu mảng
-                        arrayStory.add(story);
+                    for(Story story : storys){
+                        if(!story.getUsers().getId().equals(id)){ // lấy story userLogin để đầu mảng
+                            arrayStory.add(story);
+                        }
                     }
+                    adapterStory.notifyDataSetChanged();
                 }
-                adapterStory.notifyDataSetChanged();
                 call.cancel();
             }
 
@@ -295,21 +298,21 @@ public class HomeFragment extends Fragment implements View.OnClickListener , Com
         arrayPosts = new ArrayList<>();
         postsRetrofit = retrofit.create(PostsRetrofit.class);
         arrayPosts.clear();
-        Call<List<Posts>> callposts = postsRetrofit.getPosts();
+        Call<List<Posts>> callposts = postsRetrofit.getPosts(token);
         callposts.enqueue(new Callback<List<Posts>>() {
             @Override
             public void onResponse(Call<List<Posts>> call, Response<List<Posts>> response) {
                 if(!response.isSuccessful()){
-                    Toast.makeText(getContext(), "lỗi rác posts", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                List<Posts> posts = response.body();
-                for(Posts post : posts){
-                    if(post.getFile().getVideo().length()<10)
-                        arrayPosts.add(post);
-                }
+                    LogoutSuccess();
+                }else{
+                    List<Posts> posts = response.body();
+                    for(Posts post : posts){
+                        if(post.getFile().getVideo().length()<10)
+                            arrayPosts.add(post);
+                    }
 //                Collections.reverse(arrayPosts);
-                adapterPosts.notifyDataSetChanged();
+                    adapterPosts.notifyDataSetChanged();
+                }
                 call.cancel();
             }
 
@@ -319,7 +322,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener , Com
                 call.cancel();
             }
         });
-        adapterPosts = new postsAdapter(arrayPosts, getActivity().getApplicationContext(), listener);
+        adapterPosts = new postsAdapter(arrayPosts, getActivity().getApplicationContext(), listener, nestedScrollView);
         recyclerViewstatus.setAdapter(adapterPosts);
     }
     private void setOnClickListener(){
@@ -356,22 +359,8 @@ public class HomeFragment extends Fragment implements View.OnClickListener , Com
                 personal.putExtra("username",arrayPosts.get(position).getIduser().getUsername());
                 startActivity(personal);
             }
+        };
 
-            @Override
-            public void showIconStatus(RelativeLayout ejmotionLike, RecyclerView recyclerView, int position, Context context) {
-                Log.d("nádasd","1 "+ arrGif);
-                recyclerView.setHasFixedSize(true);
-                recyclerView.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false));
-                AdapterEjmotionLike adapterEjmotionLike = new AdapterEjmotionLike(arrGif, context, ejmotionListener, nestedScrollView);
-                recyclerView.setAdapter(adapterEjmotionLike);
-            }
-        };
-        ejmotionListener = new AdapterEjmotionLike.onClickEjmotionStatus() {
-            @Override
-            public void onclick(int position) {
-                Toast.makeText(getContext(), " "+position, Toast.LENGTH_SHORT).show();
-            }
-        };
     }
     private void addEjmotion(){
         arrGif = new ArrayList<>();
@@ -382,6 +371,21 @@ public class HomeFragment extends Fragment implements View.OnClickListener , Com
         arrGif.add(R.drawable.ejmotionwow);
         arrGif.add(R.drawable.ejmotionsad);
         arrGif.add(R.drawable.ejmotionphanno);
+    }
+    private void LogoutSuccess() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setMessage("Hết phiên đăng nhập")
+                .setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        SessionManagement sessionManagement = new SessionManagement(getActivity().getApplicationContext());
+                        sessionManagement.removeSession();
+                        Intent intent = new Intent(getActivity().getApplicationContext(), LoginActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                        startActivity(intent);
+                        getActivity().finish();
+                    }
+                });
+        builder.create().show();
     }
     @Override
     public void onTrimMemory(int level) {

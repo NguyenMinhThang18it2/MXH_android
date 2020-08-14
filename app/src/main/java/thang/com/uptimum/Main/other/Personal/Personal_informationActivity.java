@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import android.app.ActionBar;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -37,10 +38,15 @@ public class Personal_informationActivity extends AppCompatActivity implements V
     private Retrofit retrofit;
     private ProfileRetrofit profileRetrofit;
     private Toolbar toolbar;
+    private String token = "";
+    private SharedPreferences sessionManagement;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_personal_information);
+        sessionManagement = Personal_informationActivity.this.getSharedPreferences("userlogin", MODE_PRIVATE);
+        token = "Bearer "+sessionManagement.getString("token","");
+
         networkUtil = new NetworkUtil();
         retrofit = networkUtil.getRetrofit();
         toolbar = (Toolbar) findViewById(R.id.toolbarInfor);
@@ -146,7 +152,7 @@ public class Personal_informationActivity extends AppCompatActivity implements V
     }
     private void uploadInfor(){
         profileRetrofit = retrofit.create(ProfileRetrofit.class);
-        Call<Error> errorCall = profileRetrofit.postProfile(id,nickname,phone,dateofbirth,studies,studied,placeslive,from,job);
+        Call<Error> errorCall = profileRetrofit.postProfile(token, id,nickname,phone,dateofbirth,studies,studied,placeslive,from,job);
         errorCall.enqueue(new Callback<Error>() {
             @Override
             public void onResponse(Call<Error> call, Response<Error> response) {
@@ -173,7 +179,7 @@ public class Personal_informationActivity extends AppCompatActivity implements V
         });
         if(!username.isEmpty()){
             Log.d("informationActivity", "zoo "+username);
-            Call<Error> errorCall1 = profileRetrofit.postUserName(id, username);
+            Call<Error> errorCall1 = profileRetrofit.postUserName(token, id, username);
             errorCall1.enqueue(new Callback<Error>() {
                 @Override
                 public void onResponse(Call<Error> call, Response<Error> response) {

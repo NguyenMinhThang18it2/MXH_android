@@ -13,6 +13,6 @@ public class CubeTransformerViewpager implements ViewPager2.PageTransformer {
 
         page.setPivotY(page.getHeight()*0.5f);
 
-        page.setRotationY(30f * position);
+        page.setRotationY(20f * position);
     }
 }

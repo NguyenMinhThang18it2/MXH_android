@@ -48,7 +48,7 @@ public class FriendFragment extends Fragment {
     private AdapterFriend adapterFriend;
 
     private SharedPreferences sessionManagement;
-    private String id ="";
+    private String id ="", token = "";
     public FriendFragment() {
         // Required empty public constructor
     }
@@ -78,10 +78,11 @@ public class FriendFragment extends Fragment {
     private void getIdUserLogin(){
         sessionManagement = getContext().getApplicationContext().getSharedPreferences("userlogin", Context.MODE_PRIVATE);
         id = sessionManagement.getString("id","");
+        token = "Bearer "+sessionManagement.getString("token","");
     }
     private void getData(){
         friendRetrofit = retrofit.create(FriendRetrofit.class);
-        Call<List<Friend>> listCall = friendRetrofit.getFriend(id);
+        Call<List<Friend>> listCall = friendRetrofit.getFriend(token, id);
         listCall.enqueue(new Callback<List<Friend>>() {
             @Override
             public void onResponse(Call<List<Friend>> call, Response<List<Friend>> response) {

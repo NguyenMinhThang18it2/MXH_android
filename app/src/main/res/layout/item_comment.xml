@@ -121,6 +121,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="3dp"
                 android:layout_marginRight="3dp"
+                android:textColor="@color/likecomment"
                 android:text="Time" />
 
             <TextView
@@ -130,8 +131,9 @@
                 android:layout_marginLeft="3dp"
                 android:layout_marginRight="3dp"
                 android:layout_toRightOf="@id/txtTimeCmt"
+                android:textColor="@color/likecomment"
                 android:text="Thich"
-                android:textColor="@color/title" />
+                />
 
             <TextView
                 android:id="@+id/txtReplyCmt"
@@ -140,7 +142,7 @@
                 android:layout_marginLeft="3dp"
                 android:layout_toRightOf="@id/txtLikeCmt"
                 android:text="Trả lời"
-                android:textColor="@color/title" />
+                android:textColor="@color/likecomment"/>
         </RelativeLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>

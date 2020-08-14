@@ -5,18 +5,12 @@
         android:fromYScale="0"
         android:toXScale="1"
         android:toYScale="1"
-        android:pivotX="20%"
-        android:pivotY="20%"
-        android:duration="800"
-        android:fillBefore="false"
+        android:pivotX="30%"
+        android:pivotY="100%"
+        android:duration="100"
         />
     <translate
-    android:fromXDelta="0%"
+    android:fromXDelta="30%"
     android:fromYDelta="100%"
-    android:duration="800"/>
-    <alpha
-        android:fromAlpha="0.1"
-        android:toAlpha="1.0"
-        android:duration="800"
-        />
+    android:duration="100"/>
 </set>

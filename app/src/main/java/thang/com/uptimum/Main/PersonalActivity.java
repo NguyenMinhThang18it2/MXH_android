@@ -2,6 +2,7 @@ package thang.com.uptimum.Main;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -80,6 +81,7 @@ import static thang.com.uptimum.Socket.SocketIO.socket;
 public class PersonalActivity extends AppCompatActivity implements View.OnClickListener {
     private final String TAG = "PersonalActivity";
 
+    private NestedScrollView nestedScrollViewPersonal;
     private RecyclerView rcvFriendPf;
     private RoundedImageView roundedImageViewCover;
     private CircleImageView circleImageViewAvata, AvataPosts;
@@ -92,7 +94,7 @@ public class PersonalActivity extends AppCompatActivity implements View.OnClickL
     //thông tin user
     private SwipeRefreshLayout refreshPersonal;
     private SharedPreferences sessionManagement;
-    private String id = "", iduserLogin ="", avata ="", coverimage ="";
+    private String id = "", iduserLogin ="", avata ="", coverimage ="", token = "";
     private String username="", nickname="", phone="", dateofbirth="",studies="", studied="", placeslive="", from="", job="";
     //retrofit
     private ProfileRetrofit profileRetrofit;
@@ -163,6 +165,7 @@ public class PersonalActivity extends AppCompatActivity implements View.OnClickL
 
     }
     private void mapingView(){
+        nestedScrollViewPersonal = (NestedScrollView) findViewById(R.id.nestedScrollViewPersonal);
         refreshPersonal = (SwipeRefreshLayout) findViewById(R.id.refreshPersonal);
         OtherPeopleAdd = (LinearLayout) findViewById(R.id.OtherPeopleAdd);
         OtherPeopletxtMess = (LinearLayout) findViewById(R.id.OtherPeopletxtMess);
@@ -321,7 +324,7 @@ public class PersonalActivity extends AppCompatActivity implements View.OnClickL
                 uri = data.getData();
                 realdPath = getPathFromURI(getApplicationContext(),uri);
                 Log.d(TAG, " haha "+realdPath);
-                Picasso.get().load(uri).resize(100,200).fit().centerCrop().into(circleImageViewAvata);
+                Picasso.get().load(uri).fit().centerCrop().into(circleImageViewAvata);
                 uploadImgProfile("avataprofile");
             }
             if(requestCode == PICK_COVERIMG_REQUEST){
@@ -329,7 +332,7 @@ public class PersonalActivity extends AppCompatActivity implements View.OnClickL
                 uri = data.getData();
                 realdPath = getPathFromURI(getApplicationContext(),uri);
                 Log.d(TAG, " haha "+realdPath);
-                Picasso.get().load(uri).resize(400,200).fit().centerCrop().into(roundedImageViewCover);
+                Picasso.get().load(uri).fit().centerCrop().into(roundedImageViewCover);
                 uploadImgProfile("coverimgprofile");
             }
         }
@@ -361,6 +364,7 @@ public class PersonalActivity extends AppCompatActivity implements View.OnClickL
         Log.d(TAG, " "+ id);
         sessionManagement = PersonalActivity.this.getSharedPreferences("userlogin",Context.MODE_PRIVATE);
         iduserLogin = sessionManagement.getString("id","");
+        token = "Bearer "+sessionManagement.getString("token","");;
     }
     private void setDataNotProfile(){
         if(checkImg == true)
@@ -371,7 +375,7 @@ public class PersonalActivity extends AppCompatActivity implements View.OnClickL
     private void getDataUser(){
         Log.d(TAG, "vào ");
         profileRetrofit = retrofit.create(ProfileRetrofit.class);
-        Call<ProfileUser> profileCall = profileRetrofit.getProfile(id);
+        Call<ProfileUser> profileCall = profileRetrofit.getProfile(token, id);
         profileCall.enqueue(new Callback<ProfileUser>() {
             @Override
             public void onResponse(Call<ProfileUser> call, Response<ProfileUser> response) {
@@ -452,7 +456,7 @@ public class PersonalActivity extends AppCompatActivity implements View.OnClickL
     }
     private void getPostsUser(){
         postsRetrofit = retrofit.create(PostsRetrofit.class);
-        Call<List<Posts>> listCallPosts = postsRetrofit.getPostsUser(id);
+        Call<List<Posts>> listCallPosts = postsRetrofit.getPostsUser(token, id);
         listCallPosts.enqueue(new Callback<List<Posts>>() {
             @Override
             public void onResponse(Call<List<Posts>> call, Response<List<Posts>> response) {
@@ -476,13 +480,13 @@ public class PersonalActivity extends AppCompatActivity implements View.OnClickL
                 call.cancel();
             }
         });
-        adapterPosts = new postsAdapter(arrayPosts, PersonalActivity.this, listenerPosts);
+        adapterPosts = new postsAdapter(arrayPosts, PersonalActivity.this, listenerPosts, nestedScrollViewPersonal);
         rcvPostsUser.setAdapter(adapterPosts);
     }
     private void getNumberFollower(){
         arrFollowers.clear();
         followRetrofit = retrofit.create(FollowRetrofit.class);
-        Call<List<Followers>> listCall = followRetrofit.getFollowers(id);
+        Call<List<Followers>> listCall = followRetrofit.getFollowers(token, id);
         listCall.enqueue(new Callback<List<Followers>>() {
             @Override
             public void onResponse(Call<List<Followers>> call, Response<List<Followers>> response) {
@@ -512,7 +516,7 @@ public class PersonalActivity extends AppCompatActivity implements View.OnClickL
     private void getNumberFollowing(){
         arrFollowers.clear();
         followRetrofit = retrofit.create(FollowRetrofit.class);
-        Call<List<Following>> listCall = followRetrofit.getFollowing(id);
+        Call<List<Following>> listCall = followRetrofit.getFollowing(token, id);
         listCall.enqueue(new Callback<List<Following>>() {
             @Override
             public void onResponse(Call<List<Following>> call, Response<List<Following>> response) {
@@ -544,7 +548,7 @@ public class PersonalActivity extends AppCompatActivity implements View.OnClickL
     }
     private void getDataFriend(){
         friendRetrofit = retrofit.create(FriendRetrofit.class);
-        Call<List<Friend>> listCall = friendRetrofit.getFriend(id);
+        Call<List<Friend>> listCall = friendRetrofit.getFriend(token, id);
         listCall.enqueue(new Callback<List<Friend>>() {
             @Override
             public void onResponse(Call<List<Friend>> call, Response<List<Friend>> response) {
@@ -611,10 +615,6 @@ public class PersonalActivity extends AppCompatActivity implements View.OnClickL
 
             }
 
-            @Override
-            public void showIconStatus(RelativeLayout ejmotionLike, RecyclerView recyclerView, int position, Context context) {
-
-            }
 
         };
         mListenerFriend = new AdapterFriendPf.OnclickRecycelListener() {
@@ -644,7 +644,7 @@ public class PersonalActivity extends AppCompatActivity implements View.OnClickL
         MultipartBody.Part part = MultipartBody.Part.createFormData("image",file_path, requestBody);
         Log.d(TAG," "+part);
         profileRetrofit = retrofit.create(ProfileRetrofit.class);
-        Call<Error> errorCall = profileRetrofit.postImgProfile(id,typeimg,part);
+        Call<Error> errorCall = profileRetrofit.postImgProfile(token, id,typeimg,part);
         errorCall.enqueue(new Callback<Error>() {
             @Override
             public void onResponse(Call<Error> call, Response<Error> response) {

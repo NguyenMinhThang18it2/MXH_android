@@ -30,7 +30,7 @@ public class ShowAllStoriesActivity extends AppCompatActivity {
     private RecyclerView rcvShowAllStories;
     private Toolbar toolbar;
     private SharedPreferences sessionManagement;
-    private String id="";
+    private String id="", token = "";
 
     private StoryRetrofit storyRetrofit;
     private NetworkUtil networkUtil;
@@ -65,13 +65,14 @@ public class ShowAllStoriesActivity extends AppCompatActivity {
 
         sessionManagement = this.getSharedPreferences("userlogin", Context.MODE_PRIVATE);
         id = sessionManagement.getString("id","");
+        token = "Bearer "+sessionManagement.getString("token","");
 
         getStory();
     }
     private void getStory() {
         arrayStory.clear();
         storyRetrofit = retrofit.create(StoryRetrofit.class);
-        Call<List<Story>> callstory = storyRetrofit.getStory();
+        Call<List<Story>> callstory = storyRetrofit.getStory(token);
         callstory.enqueue(new Callback<List<Story>>() {
             @Override
             public void onResponse(Call<List<Story>> call, Response<List<Story>> response) {

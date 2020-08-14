@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.squareup.picasso.Picasso;
 
@@ -46,7 +47,8 @@ public class commentAdapter extends RecyclerView.Adapter<commentAdapter.ViewHold
     @Override
     public void onBindViewHolder(@NonNull commentAdapter.ViewHolder holder, int position) {
         holder.txtTimeCmt.setText(date.time(cmt.get(position).getCreatedAt()));
-        Picasso.get().load(BASE_URL+"uploads/"+cmt.get(position).getIduser().getAvata()).resize(100,100).into(holder.avataUserCmt);
+        Glide.with(context).load(BASE_URL+"uploads/"+cmt.get(position).getIduser().getAvata())
+                .into(holder.avataUserCmt);
         holder.avataUserCmt.setAnimation(AnimationUtils.loadAnimation(context, R.anim.fade_transition_animation));
         holder.layoutComment.setAnimation(AnimationUtils.loadAnimation(context, R.anim.fade_scale_animation));
 
@@ -58,7 +60,8 @@ public class commentAdapter extends RecyclerView.Adapter<commentAdapter.ViewHold
             layoutParams.width = 600;
             layoutParams.height = 350;
             holder.imgComment.setLayoutParams(layoutParams);
-            Picasso.get().load(BASE_URL+"uploads/"+cmt.get(position).getFile().getImageComment()).into(holder.imgComment);
+            Glide.with(context).load(BASE_URL+"uploads/"+cmt.get(position).getFile().getImageComment())
+                    .into(holder.imgComment);
         }
 //        holder.txtNumberLikeCmt.setText(cmt.get(position).getNumberLike().getTypeLike());
     }

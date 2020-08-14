@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 
@@ -28,17 +29,25 @@ import java.util.Collections;
 import static thang.com.uptimum.Socket.SocketIO.socket;
 
 import io.socket.emitter.Emitter;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 import thang.com.uptimum.Date.Timeupload;
 import thang.com.uptimum.R;
 import thang.com.uptimum.adapter.friendrequestAdapter;
 import thang.com.uptimum.adapter.notificationAdapter;
+import thang.com.uptimum.model.Error;
 import thang.com.uptimum.model.ListNotification;
+import thang.com.uptimum.network.NetworkUtil;
+import thang.com.uptimum.network.NotificationRetrofit;
 
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class NotificationFragment extends Fragment {
+    private static final String TAG = "NotificationFragment";
     private View view;
     private RecyclerView recyclerViewNotification, recyclerViewFriendReq, recyclerviewNewNotification;
     private LinearLayoutManager linearLayoutManagerNotify, linearLayoutManagerFriendReq, linearLayoutManagerNewNotify;
@@ -52,12 +61,15 @@ public class NotificationFragment extends Fragment {
     //new Notification
     private ArrayList<ListNotification> listNewNotify;
 
-
     private SharedPreferences sessionManagement ;
-    private String iduser ;
+    private String iduser="", token="" ;
 
     private Timeupload timeupload;
     private JSONObject iduserNotification;
+
+    private NetworkUtil networkUtil;
+    private Retrofit retrofit;
+    private NotificationRetrofit notificationRetrofit;
     public NotificationFragment() {
         // Required empty public constructor
     }
@@ -70,7 +82,8 @@ public class NotificationFragment extends Fragment {
         view =  inflater.inflate(R.layout.fragment_notification, container, false);
 
         timeupload = new Timeupload();
-
+        networkUtil = new NetworkUtil();
+        retrofit = networkUtil.getRetrofit();
         maping();
         eventListener();
         getData();
@@ -100,14 +113,29 @@ public class NotificationFragment extends Fragment {
 
         sessionManagement = getContext().getApplicationContext().getSharedPreferences("userlogin", Context.MODE_PRIVATE);
         iduser = sessionManagement.getString("id","");
+        token = "Bearer "+sessionManagement.getString("token","");
     }
     private void eventListener(){
         refreshNotification.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                clearData();
+                readAll();// update đánh dấu tất cả đã đọc
                 socket.emit("get all notification", iduserNotification);
+                refreshNotification.setRefreshing(false);
             }
         });
+    }
+    private void clearData(){
+        recyclerViewFriendReq.getRecycledViewPool().clear();
+        recyclerViewFriendReq.setAdapter(null);
+        recyclerViewNotification.getRecycledViewPool().clear();
+        recyclerViewNotification.setAdapter(null);
+        recyclerviewNewNotification.getRecycledViewPool().clear();
+        recyclerviewNewNotification.setAdapter(null);
+        System.runFinalization();
+        Runtime.getRuntime().gc();
+        System.gc();
     }
     private void getData(){
         iduserNotification = new JSONObject();
@@ -253,4 +281,31 @@ public class NotificationFragment extends Fragment {
             });
         }
     };
+    private void readAll(){
+        notificationRetrofit = retrofit.create(NotificationRetrofit.class);
+        Call<Error> errorCall = notificationRetrofit.readAll(token, iduser);
+        errorCall.enqueue(new Callback<Error>() {
+            @Override
+            public void onResponse(Call<Error> call, Response<Error> response) {
+                if(!response.isSuccessful()){
+                    Toast.makeText(getContext(), "lỗi rác story", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                Error error = response.body();
+                if(!error.isSuccess()){
+                    Toast.makeText(getContext(), "read all faile", Toast.LENGTH_SHORT).show();
+                }else{
+                    Toast.makeText(getContext(), "read all success", Toast.LENGTH_SHORT).show();
+                }
+                call.cancel();
+            }
+
+            @Override
+            public void onFailure(Call<Error> call, Throwable t) {
+                Toast.makeText(getContext(), "lỗi", Toast.LENGTH_SHORT).show();
+                Log.d(TAG," "+ t.getMessage());
+                call.cancel();
+            }
+        });
+    }
 }

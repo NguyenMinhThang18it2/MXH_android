@@ -1,9 +1,13 @@
 package thang.com.uptimum.Main;
 
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -181,7 +185,7 @@ public class MenuFragment extends Fragment implements View.OnTouchListener {
                 break;
             case MotionEvent.ACTION_UP:
                 viewPager2.setUserInputEnabled(true);
-                beforeAnimateNormalBack();
+                chooseAnimateNormalBack();
                 Log.d("abbcasd", "ACTION_UP " + event.getRawX()+ " "+event.getRawY());
                 break;
             case MotionEvent.ACTION_CANCEL:
@@ -277,6 +281,22 @@ public class MenuFragment extends Fragment implements View.OnTouchListener {
             arr.get(i).getLayoutParams().height = dpToPx(45);
             arr.get(i).getLayoutParams().width = dpToPx(45);
             arr.get(i).requestLayout();
+        }
+    }
+    private void chooseAnimateNormalBack(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Path path = new Path();
+            path.arcTo(-220f, -180f, arrRel.get(currentPosition).getRight()-dpToPx(60), 1080f, -45f, -135f, false);
+            path.setLastPoint(-130f, 80f);
+            ObjectAnimator animator = ObjectAnimator.ofFloat(arrRel.get(currentPosition), View.X, View.Y, path);
+            AnimatorSet animatorSet = new AnimatorSet();
+            ObjectAnimator scaleY = ObjectAnimator.ofFloat(arrRel.get(currentPosition), "scaleY", 1f, 0.1f);
+            ObjectAnimator scaleX = ObjectAnimator.ofFloat(arrRel.get(currentPosition), "scaleX", 1f, 0.1f);
+            animatorSet.playTogether(scaleX, scaleY, animator);
+            animatorSet.setDuration(1000);
+            animatorSet.start();
+        } else {
+            // Create animator without using curved path
         }
     }
 }

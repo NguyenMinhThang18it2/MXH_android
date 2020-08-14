@@ -10,6 +10,7 @@ import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
@@ -21,12 +22,14 @@ import thang.com.uptimum.model.ProfileUser;
 public interface ProfileRetrofit {
     @GET("api/profile/{id}")
     Call<ProfileUser> getProfile(
+            @Header("Authorization") String auth,
             @Path("id") String iduser
     );
 
     @POST("api/profile/{id}")
     @FormUrlEncoded
     Call<Error> postProfile(
+            @Header("Authorization") String auth,
             @Path("id") String iduser,
             @Field("nickname") String nickname,
             @Field("phone") String phone,
@@ -41,6 +44,7 @@ public interface ProfileRetrofit {
     @POST("api/profileusername/{id}")
     @FormUrlEncoded
     Call<Error> postUserName(
+            @Header("Authorization") String auth,
             @Path("id") String iduser,
             @Field("username") String username
     );
@@ -48,6 +52,7 @@ public interface ProfileRetrofit {
     @Multipart
     @POST("api/{type}/{id}")
     Call<Error> postImgProfile(
+            @Header("Authorization") String auth,
             @Path("id") String iduser,
             @Path("type") String type,
             @Part MultipartBody.Part upload

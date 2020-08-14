@@ -46,20 +46,20 @@ public class LoginActivity extends AppCompatActivity {
     private NetworkUtil networkUtil;
     private Retrofit retrofit;
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        sessionManagement = new SessionManagement(LoginActivity.this);
-        sessionManagement.getSession();
-
-        int idsession = sessionManagement.getSession();
-        if(idsession != -1){
-            LoginSuccess();
-        }
-        else {
-
-        }
-    }
+//    @Override
+//    protected void onStart() {
+//        super.onStart();
+//        sessionManagement = new SessionManagement(LoginActivity.this);
+//        sessionManagement.getSession();
+//
+//        int idsession = sessionManagement.getSession();
+//        if(idsession != -1){
+//            LoginSuccess();
+//        }
+//        else {
+//
+//        }
+//    }
 
     //    @Override
 //    protected void onStop() {
@@ -141,6 +141,7 @@ public class LoginActivity extends AppCompatActivity {
                             editoruser.putString("email",login.getUsers().getEmail());
                             editoruser.putString("avata",login.getUsers().getAvata());
                             editoruser.putString("coverimage",login.getUsers().getCoverimage());
+                            editoruser.putString("token", login.getToken());
                             editoruser.apply();
 
                             sessionManagement = new SessionManagement(LoginActivity.this);

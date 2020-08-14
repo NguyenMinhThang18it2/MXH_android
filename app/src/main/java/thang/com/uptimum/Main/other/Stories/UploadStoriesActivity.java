@@ -63,7 +63,7 @@ public class UploadStoriesActivity extends AppCompatActivity implements View.OnC
     private String realPathfile ="";
 
     private SharedPreferences sessionManagement;
-    private String id="";
+    private String id="", token = "";
 
     private ArrayList<Uri> uriArr;
     private ArrayList<String> realPathfileArray;
@@ -96,6 +96,7 @@ public class UploadStoriesActivity extends AppCompatActivity implements View.OnC
 
         sessionManagement = this.getSharedPreferences("userlogin",Context.MODE_PRIVATE);
         id = sessionManagement.getString("id","");
+        token = "Bearer "+sessionManagement.getString("token","");
 
         btnSelectImg.setOnClickListener(this);
         UploadStories.setOnClickListener(this);
@@ -183,7 +184,7 @@ public class UploadStoriesActivity extends AppCompatActivity implements View.OnC
         }
         storyRetrofit = retrofit.create(StoryRetrofit.class);
 
-        Call<Error> errorCall = storyRetrofit.postStory(id,parts);
+        Call<Error> errorCall = storyRetrofit.postStory(token, id,parts);
         errorCall.enqueue(new Callback<Error>() {
             @Override
             public void onResponse(Call<Error> call, Response<Error> response) {

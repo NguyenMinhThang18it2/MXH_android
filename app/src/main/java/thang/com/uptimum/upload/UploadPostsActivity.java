@@ -121,7 +121,7 @@ public class UploadPostsActivity extends AppCompatActivity implements View.OnCli
     private String realPathfile="";
 
     private SharedPreferences sessionManagement;
-    private String id="";
+    private String id="", token = "";
 
     @Override
     protected void onPause() {
@@ -173,6 +173,7 @@ public class UploadPostsActivity extends AppCompatActivity implements View.OnCli
         // lấy iduser đăng nhập
         sessionManagement = UploadPostsActivity.this.getSharedPreferences("userlogin",Context.MODE_PRIVATE);
         id = sessionManagement.getString("id","");
+        token = "Bearer "+sessionManagement.getString("token","");
 
         checkImgCamera(savedInstanceState);
         addEvents();
@@ -204,7 +205,7 @@ public class UploadPostsActivity extends AppCompatActivity implements View.OnCli
         arrayTheme = new ArrayList<>();
         Retrofit retrofit = networkUtil.getRetrofit();
         themeStatusRetrofit = retrofit.create(ThemeStatusRetrofit.class);
-        Call<List<ThemeStatus>> calltheme = themeStatusRetrofit.getTheme();
+        Call<List<ThemeStatus>> calltheme = themeStatusRetrofit.getTheme(token);
         calltheme.enqueue(new Callback<List<ThemeStatus>>() {
             @Override
             public void onResponse(Call<List<ThemeStatus>> call, Response<List<ThemeStatus>> response) {
@@ -446,7 +447,7 @@ public class UploadPostsActivity extends AppCompatActivity implements View.OnCli
         Retrofit retrofit = networkUtil.getRetrofit();
         postsRetrofit = retrofit.create(PostsRetrofit.class);
 
-        Call<Error> call = postsRetrofit.postPossts(iduser, document, parts);
+        Call<Error> call = postsRetrofit.postPossts(token, iduser, document, parts);
         call.enqueue(new Callback<Error>() {
             @Override
             public void onResponse(Call<Error> call, Response<Error> response) {
@@ -473,7 +474,7 @@ public class UploadPostsActivity extends AppCompatActivity implements View.OnCli
         Retrofit retrofit = networkUtil.getRetrofit();
         postsRetrofit = retrofit.create(PostsRetrofit.class);
         Log.d("aaaaaaaaaaaaaaaaaaa", ""+id+" text = "+ textareaBackground.getText().toString()+" 123"+Theme);
-        Call<Error> call = postsRetrofit.postBackground(iduser, documentBackground, themeBacgroung);
+        Call<Error> call = postsRetrofit.postBackground(token, iduser, documentBackground, themeBacgroung);
         call.enqueue(new Callback<Error>() {
             @Override
             public void onResponse(Call<Error> call, Response<Error> response) {

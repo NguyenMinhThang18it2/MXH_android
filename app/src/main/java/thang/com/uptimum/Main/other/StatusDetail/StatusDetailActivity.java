@@ -5,7 +5,9 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -40,12 +42,13 @@ public class StatusDetailActivity extends AppCompatActivity {
     private ImageView menu;
     private RelativeLayout btnLike, btnComment;
     private ViewPager2 viewpagerStatusDetail;
-    private String idposts = "";
+    private String idposts = "", token = "";
 
     private NetworkUtil networkUtil;
     private Retrofit retrofit;
     private PostsRetrofit postsRetrofit;
     private Timeupload timeupload;
+    private SharedPreferences sessionManagement;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,6 +56,8 @@ public class StatusDetailActivity extends AppCompatActivity {
         networkUtil = new NetworkUtil();
         retrofit = networkUtil.getRetrofit();
         timeupload = new Timeupload();
+        sessionManagement = StatusDetailActivity.this.getSharedPreferences("userlogin", Context.MODE_PRIVATE);
+        token = "Bearer "+sessionManagement.getString("token","");
 
         Intent intent = getIntent();
         idposts = intent.getStringExtra("idposts");
@@ -89,7 +94,7 @@ public class StatusDetailActivity extends AppCompatActivity {
     }
     private void getDataStatus(){
         postsRetrofit = retrofit.create(PostsRetrofit.class);
-        Call<Posts> postsCall = postsRetrofit.getPostsDetail(idposts);
+        Call<Posts> postsCall = postsRetrofit.getPostsDetail(token, idposts);
         postsCall.enqueue(new Callback<Posts>() {
             @Override
             public void onResponse(Call<Posts> call, Response<Posts> response) {

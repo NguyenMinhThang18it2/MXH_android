@@ -6,6 +6,7 @@ import okhttp3.MultipartBody;
 import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.Multipart;
 import retrofit2.http.PATCH;
 import retrofit2.http.POST;
@@ -16,11 +17,14 @@ import thang.com.uptimum.model.Story;
 
 public interface StoryRetrofit {
     @GET("api/story")
-    Call<List<Story>> getStory();
+    Call<List<Story>> getStory(
+            @Header("Authorization") String auth
+    );
 
     @Multipart
     @POST("api/story/{id}")
     Call<Error> postStory(
+            @Header("Authorization") String auth,
             @Path("id") String id,
             @Part List<MultipartBody.Part> upload
     );

@@ -1,58 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+    android:id="@+id/btnAddstory"
+    android:layout_width="140dp"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="horizontal">
-
+    android:padding="5dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <LinearLayout
-        android:id="@+id/btnAddstory"
-        android:layout_width="140dp"
+        android:layout_width="120dp"
         android:layout_height="wrap_content"
-        >
-        <LinearLayout
-            android:layout_width="wrap_content"
+        android:background="@drawable/style_story">
+        <com.makeramen.roundedimageview.RoundedImageView
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/imgStory"
+            app:riv_border_width="0.1dip"
+            app:riv_border_color="#333333"
+            android:scaleType="centerCrop"
+            app:riv_corner_radius="30dip"
+            app:riv_mutate_background="true"
+            app:riv_tile_mode="clamp"
+            app:riv_corner_radius_bottom_left="10dp"
+            app:riv_corner_radius_bottom_right="10dp"
+            app:riv_corner_radius_top_left="10dp"
+            app:riv_corner_radius_top_right="10dp"
+            android:layout_width="120dp"
+            android:layout_height="200dp" />
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/imgUserStory"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            app:civ_border_width="3dp"
+            app:civ_border_color="@color/xanhdatroi"
+            android:src="@drawable/user"
+            android:layout_marginLeft="-110dp"
+            android:layout_marginTop="10dp"
+            />
+        <TextView
+            android:id="@+id/usernaemstory"
+            android:layout_width="110dp"
             android:layout_height="wrap_content"
-            android:background="@drawable/style_story"
-            android:layout_margin="10dp">
-            <com.makeramen.roundedimageview.RoundedImageView
-                xmlns:app="http://schemas.android.com/apk/res-auto"
-                android:id="@+id/imgStory"
-                app:riv_border_width="0.1dip"
-                app:riv_border_color="#333333"
-                android:scaleType="centerCrop"
-                app:riv_corner_radius="30dip"
-                app:riv_mutate_background="true"
-                app:riv_tile_mode="clamp"
-                app:riv_corner_radius_bottom_left="10dp"
-                app:riv_corner_radius_bottom_right="10dp"
-                app:riv_corner_radius_top_left="10dp"
-                app:riv_corner_radius_top_right="10dp"
-                android:layout_width="120dp"
-                android:layout_height="200dp" />
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/imgUserStory"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                app:civ_border_width="3dp"
-                app:civ_border_color="@color/xanhdatroi"
-                android:src="@drawable/user"
-                android:layout_marginLeft="-110dp"
-                android:layout_marginTop="10dp"
-                />
-            <TextView
-                android:id="@+id/usernaemstory"
-                android:layout_width="110dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:textSize="13sp"
-                android:fontFamily="sans-serif-medium"
-                android:textColor="#FFF"
-                android:text="Tạo tin mới"
-                android:layout_marginTop="80dp"
-                android:layout_marginLeft="-52dp"
-                />
-        </LinearLayout>
-
+            android:layout_gravity="center"
+            android:textSize="13sp"
+            android:fontFamily="sans-serif-medium"
+            android:textColor="#FFF"
+            android:text="Tạo tin mới"
+            android:layout_marginTop="80dp"
+            android:layout_marginLeft="-52dp"
+            />
     </LinearLayout>
 </LinearLayout>

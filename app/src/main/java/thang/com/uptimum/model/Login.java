@@ -9,11 +9,14 @@ public class Login {
     private String msg;
     @SerializedName("user")
     private Users users;
+    @SerializedName("token")
+    private String token;
 
-    public Login(boolean success, String msg, Users users) {
+    public Login(boolean success, String msg, Users users, String token) {
         this.success = success;
         this.msg = msg;
         this.users = users;
+        this.token = token;
     }
 
     @Override
@@ -22,6 +25,7 @@ public class Login {
                 "success=" + success +
                 ", msg='" + msg + '\'' +
                 ", users=" + users +
+                ", token='" + token + '\'' +
                 '}';
     }
 
@@ -47,5 +51,13 @@ public class Login {
 
     public void setUsers(Users users) {
         this.users = users;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }
