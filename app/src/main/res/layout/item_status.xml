@@ -145,20 +145,50 @@
             android:layout_marginRight="10dp"
             android:layout_marginLeft="10dp"
             >
-            <de.hdodenhof.circleimageview.CircleImageView
+            <RelativeLayout
                 android:id="@+id/iconLike"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@drawable/icon_like_facebook"
-                />
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:visibility="gone"
+                    android:layout_marginLeft="-8dp"
+                    android:id="@+id/iconLike2"
+                    app:civ_border_width="2dp"
+                    app:civ_border_color="@color/colorWhite"
+                    android:layout_toRightOf="@+id/iconLike1"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_care_png"
+                    />
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:visibility="gone"
+                    android:id="@+id/iconLike1"
+                    android:layout_marginLeft="-8dp"
+                    app:civ_border_width="2dp"
+                    app:civ_border_color="@color/colorWhite"
+                    android:layout_toRightOf="@+id/iconLike0"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_love_png"
+                    />
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/iconLike0"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_like_png"
+                    app:civ_border_color="@color/colorWhite"
+                    app:civ_border_width="2dp" />
+            </RelativeLayout>
             <TextView
-                android:id="@+id/txtLike"
+                android:id="@+id/txtNumberLike"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toRightOf="@+id/iconLike"
                 android:text="1.242"
                 android:textSize="12dp"
-                android:layout_marginLeft="5dp" />
+                android:layout_marginLeft="2dp"
+                android:layout_marginTop="1dp"/>
 
             <TextView
                 android:id="@+id/txtCmt"
@@ -210,10 +240,12 @@
                     android:tag="like" />
 
                 <TextView
+                    android:id="@+id/txtLike"
+                    android:layout_marginLeft="3dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-medium"
-                    android:text=" Like" />
+                    android:text="Thich" />
             </LinearLayout>
         </RelativeLayout>
 

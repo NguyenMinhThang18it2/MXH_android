@@ -42,6 +42,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.core.widget.NestedScrollView;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -74,12 +75,15 @@ import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
+import com.google.gson.Gson;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 import io.socket.emitter.Emitter;
@@ -89,6 +93,7 @@ import thang.com.uptimum.Main.other.MyBounceInterpolator;
 import thang.com.uptimum.R;
 
 import thang.com.uptimum.model.Posts;
+import thang.com.uptimum.model.UserLike;
 
 
 import static thang.com.uptimum.Main.MainActivity.viewPager2;
@@ -96,15 +101,16 @@ import static thang.com.uptimum.Socket.SocketIO.socket;
 import static thang.com.uptimum.util.Constants.BASE_URL;
 
 public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> {
+    private static final String TAG  = "postsAdapter";
     private SimpleExoPlayer  player;
     private ArrayList<Posts> posts;
     private Context context;
     boolean check = false;
-    private int currentPosition = 0;
-    private int typeAction = 0;
-            //
+    private int currentPosition = 0, typeAction = 0;
     private SharedPreferences sessionManagement ;
-    private String iduser ;
+    private int emotion0 = 0, emotion1 = 0, emotion2 = 0, emotion3 = 0, emotion4 = 0, emotion5 = 0, emotion6 = 0;
+    private int[] emotion;
+    private String iduser , nameUserLogin;
 
     private RecyclerviewClickListener Listener;
     private Timeupload date = new Timeupload();
@@ -132,18 +138,23 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
                 .fitCenter().centerCrop().into(holder.Avatauser);
         holder.txtTimeUpload.setText(date.time(posts.get(position).getCreatedAt()));
         holder.txtName.setText((posts.get(position).getIduser().getUsername()));
-        holder.txtLike.setText(""+posts.get(position).getLike().length);
+
         holder.txtCmt.setText(posts.get(position).getComment()+" Bình luận");
 
         sessionManagement = context.getApplicationContext().getSharedPreferences("userlogin",Context.MODE_PRIVATE);
         iduser = sessionManagement.getString("id","");
-        Log.d("ttahdsjahskjdas" , " "+iduser);
+        nameUserLogin = sessionManagement.getString("username", "");
+        Log.d(TAG , "iduser "+iduser);
+        // check user có like bài viết này hay không
         for(int i = 0; i < posts.get(position).getLike().length; i++){
             if(iduser.equals(posts.get(position).getLike()[i].getIduserlike())){
-                holder.imgbtnLike.setImageResource(R.drawable.icon_like_facebook);
+                typeEmotionName(holder,posts.get(position).getLike()[i].getTypeLike());
                 holder.imgbtnLike.setTag("dislike");
+                break;
             }
         }
+        // hiển thị loại emotion nhiều nhất
+        showNumberEmotion(holder, posts.get(position).getLike());
         // Like -------------------------------------------------------
         holder.btnLike.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -154,6 +165,7 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
                     like.put("idposts", posts.get(position).getId());
                     like.put("iduser", iduser);
                     like.put("action", likeTag);
+                    like.put("typelike", "0");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -163,12 +175,12 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
                     MyBounceInterpolator myBounceInterpolator = new MyBounceInterpolator(100,10);
                     animation.setInterpolator(myBounceInterpolator);
                     holder.imgbtnLike.startAnimation(animation);
-                    holder.imgbtnLike.setImageResource(R.drawable.icon_like_facebook);
+                    typeEmotionName(holder, 0);
                     holder.imgbtnLike.setTag("dislike");
                     final MediaPlayer mediaPlayer = MediaPlayer.create(context, R.raw.like);
                     mediaPlayer.start();
                 }else if(likeTag.equals("dislike")){
-                    holder.imgbtnLike.setImageResource(R.drawable.icon_dislike);
+                    typeEmotionName(holder, 100);
                     holder.imgbtnLike.setTag("like");
                 }
             }
@@ -184,10 +196,16 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
                         try {
                             String idpost = jsonObject.getString("id");
                             String numberlikeposts = jsonObject.getString("numberlikeposts");
-                            String userlike = jsonObject.getString("userlike");
-                            if(idpost.equals(posts.get(position).getId())){
-                                holder.txtLike.setText(numberlikeposts);
-                            }
+                            JSONObject userlike = (JSONObject) jsonObject.getJSONObject("userlike");
+                            Log.d(TAG, " a "+ userlike);
+                            // cập nhật số lượt like của bài viết
+                            Gson gson = new Gson();
+                            Posts postsmodel = gson.fromJson(String.valueOf(userlike), Posts.class);
+                            showNumberEmotion(holder, postsmodel.getLike());
+
+//                            if(idpost.equals(posts.get(position).getId())){
+//                                holder.txtNumberLike.setText(numberlikeposts);
+//                            }
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
@@ -350,7 +368,7 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
                         viewPager2.setUserInputEnabled(true);
                         nestedScrollView.requestDisallowInterceptTouchEvent(false);
                         // sau khi chọn ejmotion
-                        chooseAnimateNormalBack(holder);
+                        chooseAnimateNormalBack(holder, position);
                         Log.d("abbcasd", "ACTION_UP " + event.getRawX()+ " "+event.getRawY());
                         break;
                     case MotionEvent.ACTION_CANCEL:
@@ -377,7 +395,7 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
     }
 
     public class ViewHolder  extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener{
-        private TextView txtName, txtDocument, txtLike, txtCmt, textStatusBacground, txtTimeUpload;
+        private TextView txtName, txtDocument, txtEmotion, txtNumberLike, txtCmt, textStatusBacground, txtTimeUpload;
 //        private ZoomInImageView ;
         private ImageView imgbtnLike, volume_control,exo_play,exo_pause, imgStatus;
         private PlayerView videoView;
@@ -385,7 +403,7 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
         private ProgressBar progressBar;
         private RelativeLayout btnComment, btnLike, ejmotionLike, rltlayoutHideButton;
         private RecyclerView rcvShowMultiImg, rcvIconStatus;
-        private CircleImageView Avatauser;
+        private CircleImageView Avatauser, iconLike0, iconLike1, iconLike2;
         private LinearLayout linearStatus, linearbgrRecycler;
         //Emoition
         private RelativeLayout rlvEmotionReaction, rltemotionLike, rltemotionLove, rltemotionThuongThuong, rltemotionHaHa
@@ -494,12 +512,16 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
         private void mapingView(View itemView){
             linearStatus = (LinearLayout) itemView.findViewById(R.id.linearStatus);
             Avatauser = (CircleImageView) itemView.findViewById(R.id.Avatauser);
+            iconLike0 = (CircleImageView) itemView.findViewById(R.id.iconLike0);
+            iconLike1 = (CircleImageView) itemView.findViewById(R.id.iconLike1);
+            iconLike2 = (CircleImageView) itemView.findViewById(R.id.iconLike2);
             txtTimeUpload = (TextView) itemView.findViewById(R.id.txtTimeUpload);
             rcvShowMultiImg = (RecyclerView) itemView.findViewById(R.id.rcvShowMultiImg);
             btnComment = (RelativeLayout) itemView.findViewById(R.id.btnComment);
             txtName = (TextView) itemView.findViewById(R.id.txtusername);
             txtDocument = (TextView) itemView.findViewById(R.id.txtdocument);
-            txtLike = (TextView) itemView.findViewById(R.id.txtLike);
+            txtNumberLike = (TextView) itemView.findViewById(R.id.txtNumberLike);
+            txtEmotion = (TextView) itemView.findViewById(R.id.txtLike);
             txtCmt = (TextView) itemView.findViewById(R.id.txtCmt);
             textStatusBacground = (TextView) itemView.findViewById(R.id.textStatusBacground);
             imgStatus = (ImageView) itemView.findViewById(R.id.imgStatus);
@@ -627,6 +649,7 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
         typeAction = 1;
         beforeAnimationChoosing(holder);
     }
+    // chuyển đỗi dp sang px
     private int dpToPx(int dp) {
         return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
     }
@@ -678,7 +701,7 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
             holder.arr.get(i).requestLayout();
         }
     }
-    private void chooseAnimateNormalBack(postsAdapter.ViewHolder holder){
+    private void chooseAnimateNormalBack(postsAdapter.ViewHolder holder, int position){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             x = holder.arrRel.get(currentPosition).getX();
             y = holder.arrRel.get(currentPosition).getY();
@@ -690,7 +713,7 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
             ObjectAnimator scaleY = ObjectAnimator.ofFloat(holder.arrRel.get(currentPosition), "scaleY", 1f, 0.1f);
             ObjectAnimator scaleX = ObjectAnimator.ofFloat(holder.arrRel.get(currentPosition), "scaleX", 1f, 0.1f);
             animatorSet.playTogether(scaleX, scaleY, animator);
-            animatorSet.setDuration(1000);
+            animatorSet.setDuration(800);
             animatorSet.start();
             animator.addListener(new AnimatorListenerAdapter() {
                 @Override
@@ -731,7 +754,201 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
             public void run() {
                 holder.EmoitionStatus.setVisibility(View.INVISIBLE);
             }
-        },900);
+        },700);
+        // loại emotion đã chọn
+        Log.d(TAG, "a " + currentPosition);
+        JSONObject likeEmotion = new JSONObject();
+        String likeTagNow = String.valueOf(holder.imgbtnLike.getTag());
+        String actionlike = "";
+        if(likeTagNow.equals("like")){
+            actionlike = "like";
+        }else if(likeTagNow.equals("dislike")){
+            actionlike = "updatelike";
+        }
+        try {
+            likeEmotion.put("idposts", posts.get(position).getId());
+            likeEmotion.put("iduser", iduser);
+            likeEmotion.put("action", actionlike); // sữa tiếp chỗ này tao cái nha ----------------------------
+            likeEmotion.put("typelike", currentPosition);// currentPosition loại 0
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        socket.emit("Like posts to server", likeEmotion);
+        typeEmotionName(holder, currentPosition);
+        holder.imgbtnLike.setTag("dislike");
+        final MediaPlayer mediaPlayer = MediaPlayer.create(context, R.raw.like);
+        mediaPlayer.start();
+    }
+    // trả về kiểu emotion
+    private int typeEmotionName(int typeEmotion){
+        int emotion = 0;
+        switch (typeEmotion){
+            case 0:
+                emotion = R.drawable.ic_like_png;
+                break;
+            case 1:
+                emotion = R.drawable.ic_love_png;
+                break;
+            case 2:
+                emotion = R.drawable.ic_care_png;
+                break;
+            case 3:
+                emotion = R.drawable.ic_haha_png;
+                break;
+            case 4:
+                emotion = R.drawable.ic_wow_png;
+                break;
+            case 5:
+                emotion = R.drawable.ic_sad_png;
+                break;
+            case 6:
+                emotion = R.drawable.ic_angry_png;
+                break;
+        }
+        return emotion;
+    }
+    // trả về name của loại emotion
+    private void typeEmotionName(postsAdapter.ViewHolder holder,int typeEmotion){
+        String nameemotion = "";
+        int emotion = 0;
+        int color ;
+        switch (typeEmotion){
+            case 0:
+                nameemotion = "Thích";
+                emotion = R.drawable.icon_like_facebook;
+                color = R.color.emotionLike;
+                break;
+            case 1:
+                nameemotion = "Yêu thích";
+                emotion = R.drawable.ic_love_png;
+                color = R.color.emotionLove;
+                break;
+            case 2:
+                nameemotion = "Thương thương";
+                emotion = R.drawable.ic_care_png;
+                color = R.color.emotionCare;
+                break;
+            case 3:
+                nameemotion = "Haha";
+                emotion = R.drawable.ic_haha_png;
+                color = R.color.emotionCare;
+                break;
+            case 4:
+                nameemotion = "Wow";
+                emotion = R.drawable.ic_wow_png;
+                color = R.color.emotionCare;
+                break;
+            case 5:
+                nameemotion = "Buồn";
+                emotion = R.drawable.ic_sad_png;
+                color = R.color.emotionCare;
+                break;
+            case 6:
+                nameemotion = "Phẩn nộ";
+                emotion = R.drawable.ic_angry_png;
+                color = R.color.emotionAngry;
+                break;
+            default:
+                nameemotion = "Thích";
+                emotion = R.drawable.icon_dislike;
+                color = R.color.colorText;
+        }
+        holder.imgbtnLike.setImageResource(emotion);
+        holder.txtEmotion.setText(nameemotion);
+        holder.txtEmotion.setTextColor(ContextCompat.getColor(context, color));
+    }
+    // hàm này để hiển thị số lượt like của một bài viết
+    private void showNumberEmotion(postsAdapter.ViewHolder holder,  UserLike[] arrUserLike){
+        String txtNumberLike = "";
+        for(int i = 0; i < arrUserLike.length; i++){
+            if(arrUserLike[i].getIduserlike().equals(iduser)){
+                if(arrUserLike.length == 1){
+                    txtNumberLike = nameUserLogin;
+                }else{
+                    txtNumberLike = "Bạn và " + (arrUserLike.length - 1)  + " người khác";
+                }
+                break;
+            }else{
+                txtNumberLike = ""+arrUserLike.length;
+            }
+        }
+        holder.txtNumberLike.setText(txtNumberLike);
+        // số lượng loại emotion của một bài viết
+        emotion0 = 0; emotion1 = 0; emotion2 = 0; emotion3 = 0; emotion4 = 0; emotion5 = 0; emotion6 = 0;
+        emotion = new int[7];
+        if(arrUserLike.length > 0) {
+            for (int i = 0; i < arrUserLike.length; i++) {
+                switch (arrUserLike[i].getTypeLike()){
+                    case 0:
+                        emotion0++;
+                        break;
+                    case 1:
+                        emotion1++;
+                        break;
+                    case 2:
+                        emotion2++;
+                        break;
+                    case 3:
+                        emotion3++;
+                        break;
+                    case 4:
+                        emotion4++;
+                        break;
+                    case 5:
+                        emotion5++;
+                        break;
+                    case 6:
+                        emotion6++;
+                        break;
+                }
+            }
+        }
+        emotion[0] = emotion0;
+        emotion[1] = emotion1;
+        emotion[2] = emotion2;
+        emotion[3] = emotion3;
+        emotion[4] = emotion4;
+        emotion[5] = emotion5;
+        emotion[6] = emotion6;
+        Log.d(TAG, "arr  "+ Arrays.toString(emotion));
+        // tìm 3 loại emotion nhiều nhất
+        int indexfirs = 0, indexsecond = 0, indexthird = 0,  firstNumber = 0, secondNumber = 0, thirdNumber = 0;
+        for (int i = 0; i < 7; i++) {
+            if(emotion[i] > firstNumber){
+                firstNumber = emotion[i];
+                indexfirs = i;
+            }
+        }
+        emotion[indexfirs] = 0;
+        for (int i = 0; i < 7; i++) {
+            if(emotion[i] > secondNumber){
+                secondNumber = emotion[i];
+                indexsecond = i;
+            }
+        }
+        emotion[indexsecond] = 0;
+        for (int i = 0; i < 7; i++) {
+            if(emotion[i] > thirdNumber){
+                thirdNumber = emotion[i];
+                indexthird = i;
+            }
+        }
+        if(firstNumber != 0){
+            holder.iconLike0.setVisibility(View.VISIBLE);
+            holder.iconLike0.setImageResource(typeEmotionName(indexfirs));
+        }
+        if(secondNumber != 0){
+            holder.iconLike1.setVisibility(View.VISIBLE);
+            holder.iconLike1.setImageResource(typeEmotionName(indexsecond));
+        }else {
+            holder.iconLike1.setVisibility(View.GONE);
+        }
+        if(thirdNumber != 0){
+            holder.iconLike2.setVisibility(View.VISIBLE);
+            holder.iconLike2.setImageResource(typeEmotionName(indexthird));
+        }else {
+            holder.iconLike2.setVisibility(View.GONE);
+        }
     }
 
     public interface RecyclerviewClickListener{

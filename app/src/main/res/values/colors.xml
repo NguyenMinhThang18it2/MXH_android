@@ -14,4 +14,11 @@
     <color name="xemallstory">#9CB0FF</color>
     <color name="board">#ffffff</color>
     <color name="likecomment">#818181</color>
+
+<!--  color emotion like  /-->
+    <color name="emotionLike">#0284fe</color>
+    <color name="emotionLove">#FF0000</color>
+    <color name="emotionCare">#FFC800</color>
+    <color name="emotionAngry">#FF3C00</color>
+
 </resources>

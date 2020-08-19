@@ -32,6 +32,7 @@ import com.makeramen.roundedimageview.RoundedImageView;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -139,7 +140,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener , Com
         linearLayoutManagerstory =  new LinearLayoutManager
                 (getContext(), LinearLayoutManager.HORIZONTAL, false);
         linearLayoutManagerstatus =  new LinearLayoutManager
-                (getContext(), LinearLayoutManager.VERTICAL, true);
+                (getContext(), LinearLayoutManager.VERTICAL, false);
 //        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(getContext(), linearLayoutManager.getOrientation());
 //        recyclerViewstatus.addItemDecoration(dividerItemDecoration);
         recyclerViewStory.setLayoutManager(linearLayoutManagerstory);
@@ -310,7 +311,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener , Com
                         if(post.getFile().getVideo().length()<10)
                             arrayPosts.add(post);
                     }
-//                Collections.reverse(arrayPosts);
+                    Collections.reverse(arrayPosts);
                     adapterPosts.notifyDataSetChanged();
                 }
                 call.cancel();

@@ -34,8 +34,8 @@ public class Timeupload {
         String monthNumber  = (String) DateFormat.format("MM",   date); // 06
         String year         = (String) DateFormat.format("yyyy", date); // 2013
         if(d>7){
-            if(y<ycurrentTime)return day + " tháng "+monthNumber+", "+year;// 26 tháng 7,1999
-            else return day + " tháng "+monthNumber ;// 26 thang 7
+            if(y<ycurrentTime)return day + " thg "+monthNumber+", "+year;// 26 tháng 7,1999
+            else return day + " thg "+monthNumber ;// 26 thang 7
         }
         else if(d>0) return d + " ngày";
         else if(h>0) return h + " h";
