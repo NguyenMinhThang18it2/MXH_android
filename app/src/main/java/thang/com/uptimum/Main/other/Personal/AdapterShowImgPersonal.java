@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -41,9 +42,8 @@ public class AdapterShowImgPersonal extends RecyclerView.Adapter<AdapterShowImgP
 
     @Override
     public void onBindViewHolder(@NonNull AdapterShowImgPersonal.ViewHolder holder, int position) {
-        Picasso.get().load(BASE_URL+"uploads/"+arrayList.get(position))
-                .resize(200,200).into(holder.ImgPersonal);
-
+        Glide.with(context).load(BASE_URL+"uploads/"+arrayList.get(position))
+                .fitCenter().centerCrop().into(holder.ImgPersonal);
     }
 
     @Override

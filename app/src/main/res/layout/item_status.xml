@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:paddingTop="20dp"
-    android:background="#c9ccd1">
+    android:background="@color/mainBackground">
     <LinearLayout
         android:id="@+id/linearStatus"
         android:layout_width="match_parent"
@@ -137,6 +137,7 @@
             </FrameLayout>
         </LinearLayout>
         <RelativeLayout
+            android:id="@+id/rltLikeAndCmt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="5dp"
@@ -315,7 +316,7 @@
     <RelativeLayout
         android:id="@+id/EmoitionStatus"
         android:animateLayoutChanges="true"
-        android:visibility="gone"
+        android:visibility="v"
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:layout_above="@+id/kakaka">

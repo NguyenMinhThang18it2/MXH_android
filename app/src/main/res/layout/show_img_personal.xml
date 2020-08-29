@@ -8,6 +8,5 @@
         android:id="@+id/viewpager2ShowImgPersonal"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:paddingStart="80dp"
-        android:paddingEnd="80dp"/>
+        android:padding="80dp"/>
 </LinearLayout>

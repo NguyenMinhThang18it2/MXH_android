@@ -219,7 +219,9 @@
                         android:orientation="horizontal"
                         android:gravity="center"
                         android:weightSum="1">
+<!--                        add friend-->
                         <LinearLayout
+                            android:tag="add"
                             android:visibility="gone"
                             android:layout_weight="0.2"
                             android:id="@+id/OtherPeopleAdd"
@@ -241,6 +243,7 @@
                                 android:textSize="18sp"
                                 android:textStyle="bold" />
                         </LinearLayout>
+<!--                        mess-->
                         <LinearLayout
                             android:visibility="gone"
                             android:layout_weight="0.2"
@@ -258,6 +261,28 @@
                                 android:gravity="center_horizontal"
                                 android:drawableLeft="@drawable/icons_facebook_messenger_24"
                                 android:text=" Nhắn tin"
+                                android:textColor="@color/white"
+                                android:textSize="18sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+<!--                        notifi friend-->
+                        <LinearLayout
+                            android:visibility="gone"
+                            android:layout_weight="0.2"
+                            android:id="@+id/OtherPeopletxtNotifi"
+                            android:background="@drawable/button_edit_personnal"
+                            android:layout_width="match_parent"
+                            android:gravity="center"
+                            android:layout_height="40dp"
+                            android:layout_marginRight="10dp"
+                            android:layout_marginLeft="20dp">
+                            <TextView
+                                android:id="@+id/txtFriendNotifi"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:gravity="center_horizontal"
+                                android:drawableLeft="@drawable/ic_baseline_check_circle_24"
+                                android:text=" Đã gửi"
                                 android:textColor="@color/white"
                                 android:textSize="18sp"
                                 android:textStyle="bold" />

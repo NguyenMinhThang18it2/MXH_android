@@ -15,7 +15,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".Main.other.StatusDetail.StatusDetailActivity"></activity>
+        <activity android:name=".Main.SearchActivity"></activity>
+        <activity android:name=".Main.other.StatusDetail.StatusDetailActivity" />
         <activity android:name=".Main.other.Stories.ShowAllStoriesActivity" />
         <activity android:name=".Main.other.Stories.UploadStoriesActivity" />
         <activity android:name=".Main.other.Personal.Personal_informationActivity" />

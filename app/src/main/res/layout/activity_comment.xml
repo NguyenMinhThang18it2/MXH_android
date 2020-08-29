@@ -7,74 +7,330 @@
     android:orientation="vertical"
     android:background="@drawable/border_comment">
     <RelativeLayout
-        android:id="@+id/headertopcmt"
-        android:layout_width="match_parent"
-        android:layout_height="60dp">
+        android:visibility="visible"
+        android:id="@+id/rltCmt"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/linearButtonSendCmt">
         <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true">
-            <ImageView
-                android:id="@+id/btnBackUploadCmt"
-                android:layout_width="40dp"
-                android:layout_height="25dp"
-                android:layout_marginTop="5dp"
-                android:src="@drawable/ic_arrow_back_black_24dp"/>
-            <LinearLayout
+            android:id="@+id/headertopcmt"
+            android:layout_width="match_parent"
+            android:layout_height="60dp">
+            <RelativeLayout
+                android:layout_alignParentLeft="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true">
+                <ImageView
+                    android:id="@+id/btnBackUploadCmt"
+                    android:layout_width="40dp"
+                    android:layout_height="25dp"
+                    android:layout_marginTop="5dp"
+                    android:src="@drawable/ic_arrow_back_black_24dp"/>
+                <LinearLayout
+                    android:layout_centerInParent="true"
+                    android:layout_marginTop="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@id/btnBackUploadCmt">
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_like_png" />
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_care_png"
+                        android:layout_marginLeft="-5dp"/>
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_care_png"
+                        android:layout_marginLeft="-5dp"/>
+                    <TextView
+                        android:layout_marginTop="-3dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:textSize="20sp"/>
+                </LinearLayout>
+            </RelativeLayout>
+            <TextView
                 android:layout_centerInParent="true"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_toRightOf="@id/btnBackUploadCmt">
-                <de.hdodenhof.circleimageview.CircleImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/ic_facebook_blue_like_24" />
-                <de.hdodenhof.circleimageview.CircleImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/user"
-                    android:layout_marginLeft="-5dp"/>
-                <de.hdodenhof.circleimageview.CircleImageView
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/splash"
-                    android:layout_marginLeft="-5dp"/>
-                <TextView
-                    android:layout_marginTop="-3dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
-                    android:text="22"
-                    android:textSize="20sp"/>
+                android:text="Bình luận"
+                android:textColor="@color/title"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif"/>
+        </RelativeLayout>
+        <View
+            android:id="@+id/gachnagng"
+            android:layout_below="@+id/headertopcmt"
+            android:layout_width="match_parent"
+            android:layout_height="0.1dp"
+            android:background="#757575"/>
+        <io.supercharge.shimmerlayout.ShimmerLayout
+            android:id="@+id/shimmerLayout"
+            android:layout_below="@+id/gachnagng"
+            app:shimmer_animation_duration="1200"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+                <include layout="@layout/item_plade_comment"/>
+                <include layout="@layout/item_plade_comment"/>
+                <include layout="@layout/item_plade_comment"/>
+                <include layout="@layout/item_plade_comment"/>
+                <include layout="@layout/item_plade_comment"/>
+                <include layout="@layout/item_plade_comment"/>
+                <include layout="@layout/item_plade_comment"/>
+                <include layout="@layout/item_plade_comment"/>
             </LinearLayout>
-            <TextView
-                android:id="@+id/btnUpload"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="18.220 Bình luận"
-                android:textColor="#494848"
-                android:textSize="18sp"
-                android:layout_marginRight="10dp"
-                android:layout_marginTop="6dp"
-                android:layout_alignParentEnd="true"/>
+        </io.supercharge.shimmerlayout.ShimmerLayout>
+        <RelativeLayout
+            android:visibility="invisible"
+            android:id="@+id/rltRecyclerview"
+            android:layout_below="@+id/gachnagng"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerViewCmt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
         </RelativeLayout>
     </RelativeLayout>
-    <View
-        android:id="@+id/gachnagng"
-        android:layout_below="@+id/headertopcmt"
-        android:layout_width="match_parent"
-        android:layout_height="0.1dp"
-        android:background="#757575"/>
     <RelativeLayout
-        android:id="@+id/linearRecycler"
-        android:layout_below="@+id/gachnagng"
-        android:layout_width="match_parent"
-        android:layout_above="@+id/linearButtonSendCmt"
-        android:layout_height="wrap_content">
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerViewCmt"
+        android:visibility="invisible"
+        android:id="@+id/rltReplyCmt"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/linearButtonSendCmt">
+        <RelativeLayout
+            android:id="@+id/headertopReplyCmt"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="60dp">
+            <RelativeLayout
+                android:layout_alignParentLeft="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true">
+                <ImageView
+                    android:id="@+id/btnBackUploadReplyCmt"
+                    android:layout_width="40dp"
+                    android:layout_height="25dp"
+                    android:layout_marginTop="5dp"
+                    android:src="@drawable/ic_arrow_back_black_24dp"/>
+            </RelativeLayout>
+            <TextView
+                android:layout_centerInParent="true"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Trả lời"
+                android:textColor="@color/title"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif"/>
+        </RelativeLayout>
+        <View
+            android:id="@+id/gachnagngReplyCmt"
+            android:layout_below="@+id/headertopReplyCmt"
+            android:layout_width="match_parent"
+            android:layout_height="0.1dp"
+            android:background="#757575"/>
+        <androidx.core.widget.NestedScrollView
+            android:layout_below="@+id/gachnagngReplyCmt"
+            android:layout_width="match_parent"
+            android:layout_height="fill_parent"
+            android:fillViewport="true">
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+                <RelativeLayout
+                    android:id="@+id/rltCmtMain"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp"
+                        android:paddingTop="10dp">
+                        <LinearLayout
+                            android:layout_weight="7"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+                            <de.hdodenhof.circleimageview.CircleImageView
+                                android:id="@+id/avataUserCmt"
+                                android:layout_width="40dp"
+                                android:layout_height="40dp"
+                                android:layout_gravity="top"
+                                android:src="@drawable/user" />
+                        </LinearLayout>
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/layoutComment"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1">
+
+                            <RelativeLayout
+                                android:id="@+id/relativeLayout3"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:padding="5dp"
+                                android:background="@drawable/border_text_comment"
+                                android:backgroundTint="#f1f2f6 "
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintHorizontal_bias="0.0"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintVertical_bias="0.011"
+                                tools:ignore="MissingConstraints">
+
+                                <TextView
+                                    android:id="@+id/txtNameUsercmt"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="sans-serif-medium"
+                                    android:text="Nguyễn Minh Thắng"
+                                    android:textColor="@color/title"
+                                    android:textSize="20sp" />
+
+                                <TextView
+                                    android:id="@+id/txtUserCmt"
+                                    android:layout_width="337dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_below="@+id/txtNameUsercmt"
+                                    android:fontFamily="sans-serif-medium"
+                                    android:text="aaaaaaaaaaaaaaaa aaaaaaaaaaaaaa aaaaaaaaaaaaaa aaaaaaaaaaaaa aaaaaaaaaa"
+                                    android:textSize="18sp" />
+
+                            </RelativeLayout>
+
+
+                            <RelativeLayout
+                                android:id="@+id/relativeLayout4"
+                                android:padding="2dp"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:background="@drawable/button_in_personnal"
+                                android:backgroundTint="@color/white"
+                                app:layout_constraintBottom_toTopOf="@+id/roundedImageView"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintHorizontal_bias="1.0"
+                                app:layout_constraintStart_toStartOf="@+id/relativeLayout3"
+                                app:layout_constraintTop_toTopOf="@+id/relativeLayout3"
+                                app:layout_constraintVertical_bias="1.95"
+                                tools:ignore="MissingConstraints">
+                                <TextView
+                                    android:id="@+id/txtNumberLikeCmt"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:drawableLeft="@drawable/ic_facebook_blue_like_24"
+                                    android:text="20"
+                                    android:textSize="18sp"/>
+                            </RelativeLayout>
+
+                            <com.makeramen.roundedimageview.RoundedImageView
+                                android:id="@+id/roundedImageView"
+                                android:layout_width="300dp"
+                                android:layout_height="wrap_content"
+                                android:scaleType="centerCrop"
+                                android:layout_marginTop="8dp"
+                                android:visibility="visible"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintHorizontal_bias="0.0"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toBottomOf="@+id/relativeLayout3"
+                                app:riv_corner_radius_bottom_left="10dp"
+                                app:riv_corner_radius_bottom_right="10dp"
+                                app:riv_corner_radius_top_left="10dp"
+                                app:riv_corner_radius_top_right="10dp"
+                                tools:ignore="MissingConstraints" />
+
+                            <RelativeLayout
+                                android:id="@+id/relativeLayout6"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintHorizontal_bias="0.0"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toBottomOf="@+id/roundedImageView"
+                                app:layout_constraintVertical_bias="0.0"
+                                tools:ignore="MissingConstraints">
+
+                                <TextView
+                                    android:id="@+id/txtTimeCmt"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginLeft="3dp"
+                                    android:layout_marginRight="3dp"
+                                    android:textColor="@color/likecomment"
+                                    android:text="Time" />
+
+                                <TextView
+                                    android:id="@+id/txtLikeCmt"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginLeft="20dp"
+                                    android:layout_marginRight="3dp"
+                                    android:layout_toRightOf="@id/txtTimeCmt"
+                                    android:textColor="#454545"
+                                    android:text="Thich"
+                                    />
+
+                                <TextView
+                                    android:id="@+id/txtReplyCmt"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginLeft="20dp"
+                                    android:layout_toRightOf="@id/txtLikeCmt"
+                                    android:text="Trả lời"
+                                    android:textColor="#454545"/>
+                            </RelativeLayout>
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+                    </LinearLayout>
+                </RelativeLayout>
+                <io.supercharge.shimmerlayout.ShimmerLayout
+                    android:id="@+id/ShimmerLayoutReplyCmt"
+                    android:layout_below="@+id/rltCmtMain"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical"
+                        android:paddingLeft="50dp">
+                        <include layout="@layout/item_place_reply_comment"/>
+                        <include layout="@layout/item_place_reply_comment"/>
+                        <include layout="@layout/item_place_reply_comment"/>
+                        <include layout="@layout/item_place_reply_comment"/>
+                        <include layout="@layout/item_place_reply_comment"/>
+                        <include layout="@layout/item_place_reply_comment"/>
+                        <include layout="@layout/item_place_reply_comment"/>
+                    </LinearLayout>
+                </io.supercharge.shimmerlayout.ShimmerLayout>
+                <RelativeLayout
+                    android:visibility="invisible"
+                    android:id="@+id/linearRecyclerReplyCmt"
+                    android:layout_below="@+id/rltCmtMain"
+                    android:paddingLeft="50dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recyclerViewReplyCmt"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+                </RelativeLayout>
+            </RelativeLayout>
+        </androidx.core.widget.NestedScrollView>
     </RelativeLayout>
     <LinearLayout
         android:id="@+id/linearButtonSendCmt"

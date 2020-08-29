@@ -9,6 +9,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -16,16 +17,19 @@ import java.util.ArrayList;
 import de.hdodenhof.circleimageview.CircleImageView;
 import thang.com.uptimum.R;
 import thang.com.uptimum.model.Friend;
+import thang.com.uptimum.model.StatusUserLogin;
 
 import static thang.com.uptimum.util.Constants.BASE_URL;
 
 public class AdapterFriend extends RecyclerView.Adapter<AdapterFriend.ViewHolder> {
     private ArrayList<Friend> arrayList;
+    private ArrayList<StatusUserLogin> arrstatusUser;
     private Context context;
 
-    public AdapterFriend(ArrayList<Friend> arrayList, Context context) {
+    public AdapterFriend(ArrayList<Friend> arrayList, ArrayList<StatusUserLogin> arrstatusUser, Context context) {
         this.arrayList = arrayList;
         this.context = context;
+        this.arrstatusUser = arrstatusUser;
     }
 
     @NonNull
@@ -38,8 +42,19 @@ public class AdapterFriend extends RecyclerView.Adapter<AdapterFriend.ViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull AdapterFriend.ViewHolder holder, int position) {
-        Picasso.get().load(BASE_URL+"uploads/"+arrayList.get(position).getIdfriend().getAvata())
-                .resize(400,200).into(holder.avataFriend);
+        for(int i = 0; i < arrstatusUser.size(); i++){
+            if(arrstatusUser.get(i).getIduser().getId().equals(arrayList.get(position).getIdfriend().getId())){
+                if(arrstatusUser.get(i).isStatus()){
+                    holder.StatusFriend.setVisibility(View.VISIBLE);
+                }else{
+                    holder.StatusFriend.setVisibility(View.GONE);
+                }
+                arrstatusUser.remove(i);
+                break;
+            }
+        }
+        Glide.with(context).load(BASE_URL+"uploads/"+arrayList.get(position).getIdfriend().getAvata())
+                .centerCrop().fitCenter().into(holder.avataFriend);
         holder.txtUserNameFriend.setText(arrayList.get(position).getIdfriend().getUsername());
     }
 

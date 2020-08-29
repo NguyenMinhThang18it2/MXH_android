@@ -39,6 +39,7 @@
                         android:textStyle="bold"
                         android:textColor="#5476FF"/>
                     <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/btnSearch"
                         android:layout_marginRight="10dp"
                         android:padding="5dp"
                         android:layout_centerInParent="true"

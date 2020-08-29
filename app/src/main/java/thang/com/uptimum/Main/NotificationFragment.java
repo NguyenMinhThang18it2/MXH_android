@@ -150,7 +150,8 @@ public class NotificationFragment extends Fragment {
     private Emitter.Listener getdataNotification = new Emitter.Listener() {
         @Override
         public void call(Object... args) {
-            getActivity().runOnUiThread(new Runnable() {
+            Handler mHandler = new Handler(Looper.getMainLooper());
+            mHandler.post(new Runnable() {
                 @Override
                 public void run() {
                     JSONObject jsonObject = (JSONObject) args[0];

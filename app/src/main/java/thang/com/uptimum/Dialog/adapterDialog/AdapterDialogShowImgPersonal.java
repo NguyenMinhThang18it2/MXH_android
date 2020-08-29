@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.squareup.picasso.Picasso;
 
@@ -36,7 +37,8 @@ public class AdapterDialogShowImgPersonal extends RecyclerView.Adapter<AdapterDi
 
     @Override
     public void onBindViewHolder(@NonNull AdapterDialogShowImgPersonal.Viewholder holder, int position) {
-        Picasso.get().load(BASE_URL+"uploads/"+arrayList.get(position)).into(holder.imgItemShowPersonal);
+        Glide.with(context).load(BASE_URL+"uploads/"+arrayList.get(position))
+                .into(holder.imgItemShowPersonal);
     }
 
     @Override

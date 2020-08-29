@@ -3,6 +3,8 @@ package thang.com.uptimum.model;
 import com.google.gson.annotations.SerializedName;
 
 public class ListNotification {
+    @SerializedName("_id")
+    private String id;
     @SerializedName("idPosts")
     private Posts idPosts;
     @SerializedName("idStory")
@@ -18,7 +20,8 @@ public class ListNotification {
     @SerializedName("updatedAt")
     private String updateAt;
 
-    public ListNotification(Posts idPosts, String idStory, Users iduserNotify, boolean status, String title, String createAt, String updateAt) {
+    public ListNotification(String id, Posts idPosts, String idStory, Users iduserNotify, boolean status, String title, String createAt, String updateAt) {
+        this.id = id;
         this.idPosts = idPosts;
         this.idStory = idStory;
         this.iduserNotify = iduserNotify;
@@ -31,7 +34,8 @@ public class ListNotification {
     @Override
     public String toString() {
         return "ListNotification{" +
-                "idPosts='" + idPosts + '\'' +
+                "id='" + id + '\'' +
+                ", idPosts=" + idPosts +
                 ", idStory='" + idStory + '\'' +
                 ", iduserNotify=" + iduserNotify +
                 ", status=" + status +
@@ -39,6 +43,14 @@ public class ListNotification {
                 ", createAt='" + createAt + '\'' +
                 ", updateAt='" + updateAt + '\'' +
                 '}';
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public Posts getIdPosts() {

@@ -31,6 +31,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.gson.JsonObject;
 import com.makeramen.roundedimageview.RoundedImageView;
@@ -53,6 +54,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import thang.com.uptimum.Dialog.CommentBottomSheetDialog;
+import thang.com.uptimum.Dialog.DialogMenuPosts;
 import thang.com.uptimum.Dialog.DialogShowImageStatus;
 import thang.com.uptimum.Main.other.Personal.Personal_informationActivity;
 import thang.com.uptimum.Main.other.Personal.ShowImagePersonalActivity;
@@ -65,12 +67,15 @@ import thang.com.uptimum.model.Error;
 import thang.com.uptimum.model.Followers;
 import thang.com.uptimum.model.Following;
 import thang.com.uptimum.model.Friend;
+import thang.com.uptimum.model.ListNotification;
+import thang.com.uptimum.model.Notification;
 import thang.com.uptimum.model.Posts;
 import thang.com.uptimum.model.Profile;
 import thang.com.uptimum.model.ProfileUser;
 import thang.com.uptimum.network.FollowRetrofit;
 import thang.com.uptimum.network.FriendRetrofit;
 import thang.com.uptimum.network.NetworkUtil;
+import thang.com.uptimum.network.NotificationRetrofit;
 import thang.com.uptimum.network.PostsRetrofit;
 import thang.com.uptimum.network.ProfileRetrofit;
 import thang.com.uptimum.upload.UploadPostsActivity;
@@ -87,10 +92,10 @@ public class PersonalActivity extends AppCompatActivity implements View.OnClickL
     private CircleImageView circleImageViewAvata, AvataPosts;
     private ImageView ChangeAvata, ChangeCoverImage;
     private TextView txtUserNameProfile, txtNickName, txtJob, txtStudies, txtStudied, txtPlaceslive, txtFrom, txtFollower,
-            txtPfStatus, txtMess, txtAddFriend;
+            txtPfStatus, txtMess, txtAddFriend, txtFriendNotifi;
     private LinearLayout linearUserLogin, linearOtherPeople, linearProfileJob, linearProfileStudies,
             linearProfileStudied, linearProfilePlaceslive, linearProfileFrom, linearProfileFollower, linearPfShowImg, btnAddNewProfile
-            , btnEditProfile, OtherPeopleAdd, OtherPeopletxtMess;
+            , btnEditProfile, OtherPeopleAdd, OtherPeopletxtMess, OtherPeopletxtNotifi;
     //thông tin user
     private SwipeRefreshLayout refreshPersonal;
     private SharedPreferences sessionManagement;
@@ -110,7 +115,9 @@ public class PersonalActivity extends AppCompatActivity implements View.OnClickL
     private RecyclerView rcvPostsUser;
     private LinearLayoutManager linearLayoutManager;
     private postsAdapter adapterPosts;
+    private NotificationRetrofit notificationRetrofit;
     private AdapterFriendPf adapterFriendPf;
+    private ArrayList<ListNotification> arrNotifications;
     private postsAdapter.RecyclerviewClickListener listenerPosts;
     private AdapterFriendPf.OnclickRecycelListener mListenerFriend;
 
@@ -154,10 +161,13 @@ public class PersonalActivity extends AppCompatActivity implements View.OnClickL
         arrayPosts = new ArrayList<>();
         arrFollowers = new ArrayList<>();
         arrFriend = new ArrayList<>();
+        //arr này kiểm tra xem đã gửi lời mời kết bạn hay chưa
+        arrNotifications = new ArrayList<>();
         setOnClickRecyclerViewListener();
         mapingView();
         getIdUser();
         getNumberFollower();
+        getFriendNotification();
         getFriend();
         getDataUser();
         getPostsUser();
@@ -165,6 +175,8 @@ public class PersonalActivity extends AppCompatActivity implements View.OnClickL
 
     }
     private void mapingView(){
+        txtFriendNotifi = (TextView) findViewById(R.id.txtFriendNotifi);
+        OtherPeopletxtNotifi = (LinearLayout) findViewById(R.id.OtherPeopletxtNotifi);
         nestedScrollViewPersonal = (NestedScrollView) findViewById(R.id.nestedScrollViewPersonal);
         refreshPersonal = (SwipeRefreshLayout) findViewById(R.id.refreshPersonal);
         OtherPeopleAdd = (LinearLayout) findViewById(R.id.OtherPeopleAdd);
@@ -229,6 +241,7 @@ public class PersonalActivity extends AppCompatActivity implements View.OnClickL
                 clearData();
                 getIdUser();
                 getNumberFollower();
+                getFriendNotification();
                 getFriend();
                 getDataUser();
                 getPostsUser();
@@ -258,6 +271,7 @@ public class PersonalActivity extends AppCompatActivity implements View.OnClickL
         }else{
             linearOtherPeople.setVisibility(View.VISIBLE);
             Log.d(TAG, "1111 "+ arrFriend.size());
+            Log.d(TAG, "1111 "+ arrNotifications.size());
             for (int i = 0; i < arrFriend.size(); i++){
                 if(iduserLogin.equals(arrFriend.get(i).getIdfriend().getId())){
                     OtherPeopletxtMess.setVisibility(View.VISIBLE);
@@ -265,7 +279,18 @@ public class PersonalActivity extends AppCompatActivity implements View.OnClickL
                     break;
                 }
             }
-            if(OtherPeopletxtMess.getVisibility() != View.VISIBLE){
+            if(OtherPeopletxtMess.getVisibility() != View.VISIBLE) {
+                for (int i = 0; i < arrNotifications.size(); i++) {
+                    if (arrNotifications.get(i).getTitle().equals("addfriend")) {
+                        if (iduserLogin.equals(arrNotifications.get(i).getIduserNotify().getId())) {
+                            Log.d(TAG, "1111 5 " + arrNotifications.get(i).getIduserNotify().getId());
+                            OtherPeopletxtNotifi.setVisibility(View.VISIBLE);
+                            break;
+                        }
+                    }
+                }
+            }
+            if(OtherPeopletxtMess.getVisibility() != View.VISIBLE && OtherPeopletxtNotifi.getVisibility() != View.VISIBLE){
                 OtherPeopleAdd.setVisibility(View.VISIBLE);
             }
         }
@@ -343,16 +368,15 @@ public class PersonalActivity extends AppCompatActivity implements View.OnClickL
 
     }
     private void ReloadPage(){
-        Picasso.get().cancelRequest(circleImageViewAvata);
-        Picasso.get().cancelRequest(roundedImageViewCover);
         circleImageViewAvata.setImageDrawable(null);
         roundedImageViewCover.setImageDrawable(null);
 
         getIdUser();
+        getFriendNotification();
+        getFriend();
         getDataUser();
         getPostsUser();
         getNumberFollower();
-        getFriend();
     }
     private void getIdUser(){
         Intent intent = getIntent();
@@ -368,8 +392,8 @@ public class PersonalActivity extends AppCompatActivity implements View.OnClickL
     }
     private void setDataNotProfile(){
         if(checkImg == true)
-            Picasso.get().load(BASE_URL+"uploads/"+avata).fit().centerCrop().into(circleImageViewAvata);
-        Picasso.get().load(BASE_URL+"uploads/"+coverimage).fit().centerCrop().into(roundedImageViewCover);
+            Glide.with(PersonalActivity.this).load(BASE_URL+"uploads/"+avata).fitCenter().centerCrop().into(circleImageViewAvata);
+        Glide.with(PersonalActivity.this).load(BASE_URL+"uploads/"+coverimage).fitCenter().centerCrop().into(roundedImageViewCover);
         txtUserNameProfile.setText(username);
     }
     private void getDataUser(){
@@ -392,7 +416,7 @@ public class PersonalActivity extends AppCompatActivity implements View.OnClickL
                     }else{
                         setDataProfile(profileUserList);
                     }
-                    checkProfileUser();
+
                 }
                 call.cancel();
             }
@@ -418,8 +442,8 @@ public class PersonalActivity extends AppCompatActivity implements View.OnClickL
         from = dataProfile.getFrom();
         job = dataProfile.getJob();
         if(checkImg == true)
-            Picasso.get().load(avata).fit().centerCrop().into(circleImageViewAvata);
-        Picasso.get().load(coverimage).fit().centerCrop().into(roundedImageViewCover);
+            Glide.with(PersonalActivity.this).load(avata).fitCenter().centerCrop().into(circleImageViewAvata);
+        Glide.with(PersonalActivity.this).load(coverimage).fitCenter().centerCrop().into(roundedImageViewCover);
         txtUserNameProfile.setText(username);
 
         // thông tin
@@ -542,7 +566,7 @@ public class PersonalActivity extends AppCompatActivity implements View.OnClickL
     private void getFriend(){
         arrFriend.clear();
         getDataFriend();
-        Log.d(TAG, "friend "+arrFriend);
+        Log.d(TAG, "friend aa"+arrFriend);
         adapterFriendPf = new AdapterFriendPf(arrFriend, PersonalActivity.this, mListenerFriend);
         rcvFriendPf.setAdapter(adapterFriendPf);
     }
@@ -595,6 +619,20 @@ public class PersonalActivity extends AppCompatActivity implements View.OnClickL
                         CommentBottomSheetDialog.newInstance(arrayPosts.get(position).getId());
                 commentBottomSheetDialog.show(getSupportFragmentManager(),
                         "add_photo_dialog_fragment");
+            }
+
+            @Override
+            public void onclickMenu(int position) {
+                boolean checkuser = false;
+                if(id.equals(arrayPosts.get(position).getIduser().getId())){
+                    checkuser = true;
+                }else{
+                    checkuser = false;
+                }
+                DialogMenuPosts dialogMenuPosts = new DialogMenuPosts(
+                       PersonalActivity.this, arrayPosts.get(position).getId(), arrayPosts.get(position).getDocument(), checkuser
+                );
+                dialogMenuPosts.show(getSupportFragmentManager(),"menu posts");
             }
 
             @Override
@@ -691,13 +729,45 @@ public class PersonalActivity extends AppCompatActivity implements View.OnClickL
         socket.emit("add notication friend", jsonObject);
         socket.on("add friend success", callbackAddfriend);
     }
+    private void getFriendNotification(){
+        Log.d(TAG, "getFriendNotification ");
+        arrNotifications.clear();
+        notificationRetrofit = retrofit.create(NotificationRetrofit.class);
+        Call<Notification> notificationCall = notificationRetrofit.getNotification(token, id);
+        notificationCall.enqueue(new Callback<Notification>() {
+            @Override
+            public void onResponse(Call<Notification> call, Response<Notification> response) {
+                Log.d(TAG, "getFriendNotification2 ");
+                Log.d(TAG, "getFriendNotification "+response);
+                if(!response.isSuccessful()){
+                    Toast.makeText(PersonalActivity.this, "ko kết nối được", Toast.LENGTH_SHORT).show();
+                    return;
+                }else{
+
+                    Notification notification = response.body();
+                    for (ListNotification listNotification : notification.getListNotification()){
+                        arrNotifications.add(listNotification);
+                    }
+                }
+                checkProfileUser();
+                call.cancel();
+            }
+
+            @Override
+            public void onFailure(Call<Notification> call, Throwable t) {
+                Log.d(TAG, "getFriendNotification lỗi "+ t.getMessage());
+                call.cancel();
+            }
+        });
+    }
     private Emitter.Listener callbackAddfriend = new Emitter.Listener() {
         @Override
         public void call(Object... args) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-
+                    OtherPeopleAdd.setVisibility(View.GONE);
+                    OtherPeopletxtNotifi.setVisibility(View.VISIBLE);
                 }
             });
         }

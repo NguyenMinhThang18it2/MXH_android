@@ -8,7 +8,7 @@
     tools:context=".Main.HomeFragment">
 
     <io.supercharge.shimmerlayout.ShimmerLayout
-        android:visibility="gone"
+        android:visibility="visible"
         android:id="@+id/shimmer_layout"
         app:shimmer_animation_duration="1200"
         android:layout_width="wrap_content"
@@ -19,7 +19,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             >
+            <include layout="@layout/item_place_holder_headerhome"/>
             <include layout="@layout/item_place_holder_story"/>
+            <include layout="@layout/item_place_holder_status"/>
+            <include layout="@layout/item_place_holder_bottom"/>
         </LinearLayout>
 
     </io.supercharge.shimmerlayout.ShimmerLayout>
@@ -29,7 +32,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <androidx.core.widget.NestedScrollView
-            android:visibility="visible"
+            android:visibility="invisible"
             android:id="@+id/nestedScroolView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -85,7 +88,7 @@
                             android:background="#fff">
 
                             <LinearLayout
-                                android:layout_width="140dp"
+                                android:layout_width="120dp"
                                 android:layout_height="wrap_content">
                                 <com.makeramen.roundedimageview.RoundedImageView
                                     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -101,8 +104,8 @@
                                     app:riv_corner_radius_bottom_right="10dp"
                                     app:riv_corner_radius_top_left="10dp"
                                     app:riv_corner_radius_top_right="10dp"
-                                    android:layout_width="120dp"
-                                    android:layout_height="200dp" />
+                                    android:layout_width="100dp"
+                                    android:layout_height="180dp" />
                                 <de.hdodenhof.circleimageview.CircleImageView
                                     android:id="@+id/imgAvataUserLogin"
                                     android:layout_width="45dp"
@@ -110,7 +113,7 @@
                                     app:civ_border_width="2dp"
                                     app:civ_border_color="@color/xanhdatroi"
                                     android:src="@drawable/icon_add_32"
-                                    android:layout_marginLeft="-120dp"
+                                    android:layout_marginLeft="-100dp"
                                     android:layout_marginTop="20dp"
                                     />
                                 <TextView
@@ -123,7 +126,7 @@
                                     android:textColor="#FFF"
                                     android:text="Tạo tin mới"
                                     android:layout_marginTop="80dp"
-                                    android:layout_marginLeft="-52dp"
+                                    android:layout_marginLeft="-50dp"
                                     />
                             </LinearLayout>
                             <RelativeLayout

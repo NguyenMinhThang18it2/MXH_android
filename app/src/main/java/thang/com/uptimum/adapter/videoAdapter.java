@@ -71,6 +71,7 @@ public class videoAdapter extends RecyclerView.Adapter<videoAdapter.ViewHolder>{
     ArrayList<Posts> postsvideo;
     Context context;
     private Timeupload date = new Timeupload();
+    private commentAdapter.onClickListener mListener;
     public videoAdapter(ArrayList<Posts> postsvideo, Context context) {
         this.postsvideo = postsvideo;
         this.context = context;
@@ -288,6 +289,7 @@ public class videoAdapter extends RecyclerView.Adapter<videoAdapter.ViewHolder>{
 
             }
         });
+        OnClickListenerCmt();
     }
 
     @Override
@@ -366,7 +368,7 @@ public class videoAdapter extends RecyclerView.Adapter<videoAdapter.ViewHolder>{
                                 commentArrayList.add(comment);
                             }
                         }
-                        commentAdapter commentAdapter = new commentAdapter(commentArrayList,context.getApplicationContext());
+                        commentAdapter commentAdapter = new commentAdapter(commentArrayList,context.getApplicationContext(), mListener);
                         recyclerViewCmt.setAdapter(commentAdapter);
                         Log.d("dataaaaaaa"," "+ commentArrayList);
 
@@ -377,6 +379,20 @@ public class videoAdapter extends RecyclerView.Adapter<videoAdapter.ViewHolder>{
             });
         }
     };
+    private void OnClickListenerCmt(){
+        mListener = new commentAdapter.onClickListener() {
+            @Override
+            public void onCickReply(TextView btnReplyCmt, int position) {
+
+            }
+
+            @Override
+            public void onClickItemCmt(TextView txtUserCmt, int position) {
+
+            }
+
+        };
+    }
     public static int getScreenHeight() {
         return Resources.getSystem().getDisplayMetrics().heightPixels;
     }

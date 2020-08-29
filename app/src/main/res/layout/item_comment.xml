@@ -128,10 +128,10 @@
                 android:id="@+id/txtLikeCmt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="3dp"
+                android:layout_marginLeft="20dp"
                 android:layout_marginRight="3dp"
                 android:layout_toRightOf="@id/txtTimeCmt"
-                android:textColor="@color/likecomment"
+                android:textColor="#454545"
                 android:text="Thich"
                 />
 
@@ -139,10 +139,10 @@
                 android:id="@+id/txtReplyCmt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="3dp"
+                android:layout_marginLeft="20dp"
                 android:layout_toRightOf="@id/txtLikeCmt"
                 android:text="Trả lời"
-                android:textColor="@color/likecomment"/>
+                android:textColor="#454545"/>
         </RelativeLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>

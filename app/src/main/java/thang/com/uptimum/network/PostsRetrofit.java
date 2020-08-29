@@ -6,12 +6,14 @@ import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
+import retrofit2.http.DELETE;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Part;
 import retrofit2.http.Path;
 import thang.com.uptimum.model.Error;
@@ -50,7 +52,7 @@ public interface PostsRetrofit {
     Call<Error> postBackground(
             @Header("Authorization") String auth,
             @Field("iduser") String iduser,
-            @Field("document") String email,
+            @Field("document") String document,
             @Field("background") String background
     );
 
@@ -60,5 +62,19 @@ public interface PostsRetrofit {
             @Header("Authorization") String auth,
             @Path("id") String idcmt,
             @Part MultipartBody.Part uploadfilecmt
+    );
+
+    @DELETE("api/deleteposts/{id}")
+    Call<Error> deletePosts(
+            @Header("Authorization") String auth,
+            @Path("id") String idposts
+    );
+
+    @PUT("api/updateposts/{id}")
+    @FormUrlEncoded
+    Call<Error> putPosts(
+            @Header("Authorization") String auth,
+            @Path("id") String idposts,
+            @Field("document") String document
     );
 }

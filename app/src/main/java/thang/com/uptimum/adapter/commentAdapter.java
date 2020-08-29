@@ -31,9 +31,11 @@ public class commentAdapter extends RecyclerView.Adapter<commentAdapter.ViewHold
     private ArrayList<Comment> cmt;
     private Context context;
     private Timeupload date = new Timeupload();
-    public commentAdapter(ArrayList<Comment> cmt, Context context) {
+    private onClickListener mListener;
+    public commentAdapter(ArrayList<Comment> cmt, Context context, onClickListener mListener) {
         this.cmt = cmt;
         this.context = context;
+        this.mListener = mListener;
     }
 
     @NonNull
@@ -71,11 +73,12 @@ public class commentAdapter extends RecyclerView.Adapter<commentAdapter.ViewHold
         return cmt.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener{
         private CircleImageView avataUserCmt, imgIconLikeCmt2, imgIconLikeCmt3;
         private TextView txtNameUsercmt, txtUserCmt, txtTimeCmt, btnLike, btnReplyCmt, txtNumberLikeCmt;
         private RoundedImageView imgComment;
         private ConstraintLayout layoutComment;
+        private RelativeLayout relativeLayout3;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             avataUserCmt = (CircleImageView) itemView.findViewById(R.id.avataUserCmt);
@@ -89,6 +92,33 @@ public class commentAdapter extends RecyclerView.Adapter<commentAdapter.ViewHold
             btnLike = (TextView) itemView.findViewById(R.id.txtLikeCmt);
             btnReplyCmt = (TextView) itemView.findViewById(R.id.txtReplyCmt);
             txtNumberLikeCmt = (TextView) itemView.findViewById(R.id.txtNumberLikeCmt);
+            relativeLayout3 = (RelativeLayout) itemView.findViewById(R.id.relativeLayout3);
+
+            btnReplyCmt.setOnClickListener(this);
+            relativeLayout3.setOnLongClickListener(this);
         }
+
+        @Override
+        public void onClick(View v) {
+            switch (v.getId()){
+                case R.id.txtReplyCmt:
+                    mListener.onCickReply(btnReplyCmt, getAdapterPosition());
+                    break;
+            }
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            switch (v.getId()){
+                case R.id.relativeLayout3:
+                    mListener.onClickItemCmt(txtUserCmt, getAdapterPosition());
+                    break;
+            }
+            return false;
+        }
+    }
+    public interface onClickListener{
+        void onCickReply(TextView btnReplyCmt,int position);
+        void onClickItemCmt(TextView txtUserCmt, int position);
     }
 }

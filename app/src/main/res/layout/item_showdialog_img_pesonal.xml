@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.makeramen.roundedimageview.RoundedImageView
-    android:id="@+id/imgItemShowPersonal"
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    app:riv_corner_radius_bottom_right="10dp"
-    app:riv_corner_radius_bottom_left="10dp"
-    app:riv_corner_radius_top_left="10dp"
-    app:riv_corner_radius_top_right="10dp">
-
-</com.makeramen.roundedimageview.RoundedImageView>
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <com.makeramen.roundedimageview.RoundedImageView
+        android:id="@+id/imgItemShowPersonal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        app:riv_corner_radius_bottom_right="10dp"
+        app:riv_corner_radius_bottom_left="10dp"
+        app:riv_corner_radius_top_left="10dp"
+        app:riv_corner_radius_top_right="10dp"/>
+</RelativeLayout>

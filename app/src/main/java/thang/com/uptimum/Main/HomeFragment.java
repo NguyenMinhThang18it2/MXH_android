@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,6 +43,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import thang.com.uptimum.Dialog.CommentBottomSheetDialog;
+import thang.com.uptimum.Dialog.DialogMenuPosts;
 import thang.com.uptimum.Dialog.DialogShowImageStatus;
 import thang.com.uptimum.Main.other.StatusDetail.StatusDetailActivity;
 import thang.com.uptimum.Main.other.Stories.ShowAllStoriesActivity;
@@ -159,7 +161,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener , Com
 
 
         return contactsview;
-//        return inflater.inflate(R.layout.fragment_home, container, false);
     }
 
     @Override
@@ -176,8 +177,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener , Com
         System.runFinalization();
         Runtime.getRuntime().gc();
         System.gc();
-
-//        getFragmentManager().beginTransaction().addToBackStack(null).commit();
     }
     @Override
     public void onClick(View v) {
@@ -212,6 +211,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener , Com
             public void onRefresh() {
                 txtThongbao.setVisibility(View.GONE);
                 shimmerLayout.setVisibility(View.VISIBLE);
+                nestedScrollView.setVisibility(View.INVISIBLE);
                 getStory();
                 getPosts();
                 addDataUserlogin();
@@ -275,12 +275,21 @@ public class HomeFragment extends Fragment implements View.OnClickListener , Com
                     }
                     adapterStory.notifyDataSetChanged();
                 }
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        shimmerLayout.stopShimmerAnimation();
+                        nestedScrollView.setVisibility(View.VISIBLE);
+                        shimmerLayout.setVisibility(View.GONE);
+                    }
+                }, 2000);
                 call.cancel();
             }
 
             @Override
             public void onFailure(Call<List<Story>> call, Throwable t) {
                 Log.d("loaddataa","Load không được lỗi : "+t.getMessage());
+                nestedScrollView.setVisibility(View.VISIBLE);
                 shimmerLayout.setVisibility(View.GONE);
                 txtThongbao.setVisibility(View.VISIBLE);
                 call.cancel();
@@ -288,10 +297,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener , Com
         });
         adapterStory = new storyAdapter(arrayStory, getActivity().getApplicationContext());
         recyclerViewStory.setAdapter(adapterStory);
-
-        shimmerLayout.stopShimmerAnimation();
-        nestedScrollView.setVisibility(View.VISIBLE);
-        shimmerLayout.setVisibility(View.GONE);
     }
 
     private void getPosts() {
@@ -337,6 +342,21 @@ public class HomeFragment extends Fragment implements View.OnClickListener , Com
                     commentBottomSheetDialog.show(getFragmentManager(),
                             "add_photo_dialog_fragment");
             }
+
+            @Override
+            public void onclickMenu(int position) {
+                boolean checkuser = false;
+                if(id.equals(arrayPosts.get(position).getIduser().getId())){
+                    checkuser = true;
+                }else{
+                    checkuser = false;
+                }
+                DialogMenuPosts dialogMenuPosts = new DialogMenuPosts(
+                  getContext(), arrayPosts.get(position).getId(), arrayPosts.get(position).getDocument(), checkuser
+                );
+                dialogMenuPosts.show(getFragmentManager(),"menu posts");
+            }
+
             @Override
             public void showImg(ImageView imgShow, int position, int typeClick) {
                 DialogShowImageStatus dialogShowImageStatus = new DialogShowImageStatus(position, arrayPosts);

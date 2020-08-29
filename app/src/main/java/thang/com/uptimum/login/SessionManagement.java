@@ -9,7 +9,7 @@ import thang.com.uptimum.model.Users;
 public class SessionManagement {
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
-    private String SHARED_PREF_NAME = "session";
+    private String SHARED_PREF_NAME = "userlogin";
     private String SESSION_KEY = "session_key";
 
 
@@ -26,5 +26,6 @@ public class SessionManagement {
     }
     public void removeSession(){
         editor.putInt(SESSION_KEY, -1).apply();
+        editor.clear().apply();
     }
 }

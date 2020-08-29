@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,8 +14,13 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.palette.graphics.Palette;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.transition.Transition;
 import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
@@ -48,22 +54,18 @@ public class themestatusAdapter extends RecyclerView.Adapter<themestatusAdapter.
     @Override
     public void onBindViewHolder(@NonNull themestatusAdapter.ViewHolder holder, int position) {
         Log.d("position", "" + position);
-        Picasso.get().load(BASE_URL+"uploads/"+themestatuses.get(position).getThemestatus()).memoryPolicy(MemoryPolicy.NO_CACHE).into(new Target() {
-            @Override
-            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                holder.imgThemeStatus.setBackground(new BitmapDrawable(bitmap));
-            }
+        Glide.with(context).asBitmap().load(BASE_URL+"uploads/"+themestatuses.get(position).getThemestatus())
+                .into(new CustomTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                        holder.imgThemeStatus.setBackground(new BitmapDrawable(resource));
+                    }
 
-            @Override
-            public void onBitmapFailed(Exception e, Drawable errorDrawable) {
+                    @Override
+                    public void onLoadCleared(@Nullable Drawable placeholder) {
 
-            }
-
-            @Override
-            public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-            }
-        });
+                    }
+                });
         holder.imgThemeStatus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

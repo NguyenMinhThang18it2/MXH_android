@@ -10,6 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.makeramen.roundedimageview.RoundedImageView;
 import com.squareup.picasso.Picasso;
 
@@ -41,8 +42,8 @@ public class AdapterFriendPf extends RecyclerView.Adapter<AdapterFriendPf.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull AdapterFriendPf.ViewHolder holder, int position) {
-        Picasso.get().load(BASE_URL+"uploads/"+arrayList.get(position).getIdfriend().getAvata())
-                .resize(400,200).into(holder.rimgvAvataFriendPf);
+        Glide.with(context).load(BASE_URL+"uploads/"+arrayList.get(position).getIdfriend().getAvata())
+                .centerCrop().fitCenter().into(holder.rimgvAvataFriendPf);
         holder.txtNameFriendPf.setText(arrayList.get(position).getIdfriend().getUsername());
     }
 

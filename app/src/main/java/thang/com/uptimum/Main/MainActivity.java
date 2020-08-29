@@ -8,6 +8,7 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -30,6 +31,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import io.socket.emitter.Emitter;
 import thang.com.uptimum.R;
 import thang.com.uptimum.Socket.SocketIO;
@@ -44,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private BadgeDrawable badgeDrawable;
     private int numberStatus, numberNotify, numberVideo, numberMess;
     private Toolbar toolBar;
+    private CircleImageView btnSearch;
     private ArrayList<ListNotification> listNotifications;
 
     private SharedPreferences sessionManagement ;
@@ -67,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
 //        viewPager2.setCurrentItem(2,false);
         tabLayout = (TabLayout) findViewById(R.id.tablayout);
         listNotifications = new ArrayList<>();
+        btnSearch = (CircleImageView) findViewById(R.id.btnSearch);
 
         //get iduser login
         sessionManagement = MainActivity.this.getSharedPreferences("userlogin", Context.MODE_PRIVATE);
@@ -74,6 +78,16 @@ public class MainActivity extends AppCompatActivity {
         // socket
         getData();
         listenerUpdateData();
+        intentSearch();
+    }
+    private void intentSearch(){
+        btnSearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, SearchActivity.class);
+                startActivity(intent);
+            }
+        });
     }
     private void tabLayoutMediator(){
         tabLayoutMediator = new TabLayoutMediator(

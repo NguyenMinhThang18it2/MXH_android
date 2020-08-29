@@ -56,7 +56,7 @@ public class notificationAdapter extends RecyclerView.Adapter<notificationAdapte
         if(listNotifications.get(position).getTitle().equals("comment")){
             Picasso.get().load(R.drawable.icon_comment_notification).into(holder.imgStatusNotify);
             String documentNotify = "<b>" + listNotifications.get(position).getIduserNotify().getUsername() + "</b> "
-                    +"<font color=#505050> đã comment bài viết của </font><b>"+ listNotifications.get(position).getIdPosts().getIduser().getUsername()+ "</b> ";
+                    +"<font color=#505050> đã bình luận bài viết của </font><b>"+ listNotifications.get(position).getIdPosts().getIduser().getUsername()+ "</b> ";
             holder.txtDocumentNotify.setText(Html.fromHtml(documentNotify));
         }else if(listNotifications.get(position).getTitle().equals("likeposts")){
             Picasso.get().load(R.drawable.icon_like_notification).into(holder.imgStatusNotify);
@@ -67,6 +67,11 @@ public class notificationAdapter extends RecyclerView.Adapter<notificationAdapte
             Picasso.get().load(R.drawable.icon_followe_notification).into(holder.imgStatusNotify);
             String documentNotify = "<b>" + listNotifications.get(position).getIduserNotify().getUsername() + "</b>"
                     +"<font color=#505050> đã bắt đầu theo dõi bạn</font>";
+            holder.txtDocumentNotify.setText(Html.fromHtml(documentNotify));
+        }else if(listNotifications.get(position).getTitle().equals("replycomment")){
+            Picasso.get().load(R.drawable.icon_comment_notification).into(holder.imgStatusNotify);
+            String documentNotify = "<b>" + listNotifications.get(position).getIduserNotify().getUsername() + "</b> "
+                    +"<font color=#505050> đã trả lời bình luận của </font>";
             holder.txtDocumentNotify.setText(Html.fromHtml(documentNotify));
         }
         // còn new post vs new story

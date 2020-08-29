@@ -140,7 +140,8 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
         holder.txtName.setText((posts.get(position).getIduser().getUsername()));
 
         holder.txtCmt.setText(posts.get(position).getComment()+" Bình luận");
-
+        // kiểm tra số like và số cmt
+        checkLikeAndCmt(position, holder, posts, null);
         sessionManagement = context.getApplicationContext().getSharedPreferences("userlogin",Context.MODE_PRIVATE);
         iduser = sessionManagement.getString("id","");
         nameUserLogin = sessionManagement.getString("username", "");
@@ -201,8 +202,10 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
                             // cập nhật số lượt like của bài viết
                             Gson gson = new Gson();
                             Posts postsmodel = gson.fromJson(String.valueOf(userlike), Posts.class);
-                            showNumberEmotion(holder, postsmodel.getLike());
-
+                            if(posts.get(position).getId().equals(idpost)){
+                                showNumberEmotion(holder, postsmodel.getLike());
+                                checkLikeAndCmt(position, holder, null, postsmodel);
+                            }
 //                            if(idpost.equals(posts.get(position).getId())){
 //                                holder.txtNumberLike.setText(numberlikeposts);
 //                            }
@@ -397,11 +400,11 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
     public class ViewHolder  extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener{
         private TextView txtName, txtDocument, txtEmotion, txtNumberLike, txtCmt, textStatusBacground, txtTimeUpload;
 //        private ZoomInImageView ;
-        private ImageView imgbtnLike, volume_control,exo_play,exo_pause, imgStatus;
+        private ImageView imgbtnLike, volume_control,exo_play,exo_pause, imgStatus, menu;
         private PlayerView videoView;
         private FrameLayout framevideo;
         private ProgressBar progressBar;
-        private RelativeLayout btnComment, btnLike, ejmotionLike, rltlayoutHideButton;
+        private RelativeLayout btnComment, btnLike, ejmotionLike, rltlayoutHideButton, rltLikeAndCmt;
         private RecyclerView rcvShowMultiImg, rcvIconStatus;
         private CircleImageView Avatauser, iconLike0, iconLike1, iconLike2;
         private LinearLayout linearStatus, linearbgrRecycler;
@@ -427,6 +430,7 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
             imgStatus.setOnClickListener(this);
             linearStatus.setOnClickListener(this);
             Avatauser.setOnClickListener(this);
+            menu.setOnClickListener(this);
 
             btnLike.setOnLongClickListener(this);
         }
@@ -474,6 +478,9 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
                     case R.id.txtusername:
                         Listener.personalUser(posts.get(getAdapterPosition()).getIduser().getId(), getAdapterPosition());
                         break;
+                    case R.id.menu:
+                        Listener.onclickMenu(getAdapterPosition());
+                        break;
                 }
             }
         }
@@ -510,6 +517,7 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
         }
         //Touch Emotion
         private void mapingView(View itemView){
+            rltLikeAndCmt = (RelativeLayout) itemView.findViewById(R.id.rltLikeAndCmt);
             linearStatus = (LinearLayout) itemView.findViewById(R.id.linearStatus);
             Avatauser = (CircleImageView) itemView.findViewById(R.id.Avatauser);
             iconLike0 = (CircleImageView) itemView.findViewById(R.id.iconLike0);
@@ -533,6 +541,7 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
             exo_play = (ImageView)    itemView.findViewById(R.id.exo_play);
             exo_pause = (ImageView) itemView.findViewById(R.id.exo_pause);
             progressBar = (ProgressBar) itemView.findViewById(R.id.progress_bar);
+            menu = (ImageView) itemView.findViewById(R.id.menu);
         }
         private void mapingEmotion(View itemView){
             EmoitionStatus = (RelativeLayout) itemView.findViewById(R.id.EmoitionStatus);
@@ -754,7 +763,7 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
             public void run() {
                 holder.EmoitionStatus.setVisibility(View.INVISIBLE);
             }
-        },700);
+        },750);
         // loại emotion đã chọn
         Log.d(TAG, "a " + currentPosition);
         JSONObject likeEmotion = new JSONObject();
@@ -953,6 +962,7 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
 
     public interface RecyclerviewClickListener{
         void onClickComment(RelativeLayout btnComment, int position, int typeClick);
+        void onclickMenu(int position);
         void showImg(ImageView imgShow, int position, int typeClick);
         void showStatusDetail(String idposts);
         void personalUser(String iduser, int position);
@@ -1033,5 +1043,19 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
                 rcvImg.setAdapter(adapter1);
                 break;
         }
+    }
+    private void checkLikeAndCmt(int position, postsAdapter.ViewHolder holder, ArrayList<Posts> arrposts, Posts mposts){
+        int like=0, cmt =0;
+        if(arrposts != null){
+            like  = arrposts.get(position).getLike().length;
+            cmt = arrposts.get(position).getComment();
+        }else{
+            like  = mposts.getLike().length;
+            cmt = mposts.getComment();
+        }
+        if(like == 0 && cmt == 0) holder.rltLikeAndCmt.setVisibility(View.GONE);
+        else holder.rltLikeAndCmt.setVisibility(View.VISIBLE);
+
+
     }
 }

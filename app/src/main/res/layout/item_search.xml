@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:id="@+id/linearSearchAdapter"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="5dp"
+    android:paddingBottom="5dp">
+    <LinearLayout
+        android:layout_weight="15"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_gravity="center">
+        <ImageView
+            android:id="@+id/imgSearch"
+            android:layout_gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_baseline_search_24"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="5dp"
+        android:layout_gravity="center">
+        <TextView
+            android:id="@+id/txtNameSearch"
+            android:layout_gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Nguyễn Minh Thắng"
+            android:textSize="16sp"
+            android:textColor="@color/colorText"
+            android:fontFamily="sans-serif-medium"/>
+    </LinearLayout>
+</LinearLayout>

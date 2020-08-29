@@ -16,11 +16,11 @@ public class Posts {
     @SerializedName("numberLike")
     private UserLike[] like;
     @SerializedName("numberCmt")
-    private String comment;
+    private int comment;
     @SerializedName("createdAt")
     private String createdAt;
 
-    public Posts(String id, Users iduser, String document, FileMxh file, UserLike[] like, String comment, String createdAt) {
+    public Posts(String id, Users iduser, String document, FileMxh file, UserLike[] like, int comment, String createdAt) {
         this.id = id;
         this.iduser = iduser;
         this.document = document;
@@ -83,11 +83,11 @@ public class Posts {
         this.like = like;
     }
 
-    public String getComment() {
+    public int getComment() {
         return comment;
     }
 
-    public void setComment(String comment) {
+    public void setComment(int comment) {
         this.comment = comment;
     }
 
