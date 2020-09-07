@@ -28,8 +28,10 @@
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/imgStatusNotify"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                app:civ_border_width="0.1dip"
+                app:civ_border_color="@color/colorText"
                 android:src="@drawable/ic_camera"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"

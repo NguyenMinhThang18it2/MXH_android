@@ -34,17 +34,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center">
-                <View
-                    android:id="@+id/ViewTouch"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"/>
+
                 <androidx.viewpager2.widget.ViewPager2
                     android:id="@+id/viewpager2ShowImg"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
                 </androidx.viewpager2.widget.ViewPager2>
+                <View
+                    android:id="@+id/ViewTouch"
+                    android:layout_alignParentBottom="true"
+                    android:layout_width="match_parent"
+                    android:layout_height="200dp"/>
             </RelativeLayout>
+
             <LinearLayout
                 android:id="@+id/tinShowImgDialog"
                 android:layout_width="match_parent"

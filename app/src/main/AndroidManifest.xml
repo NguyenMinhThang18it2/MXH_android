@@ -15,7 +15,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".Main.SearchActivity"></activity>
+        <activity android:name=".Main.SwipeTouch.FriendRequetsActivity"></activity>
+        <activity android:name=".Main.SearchActivity" />
         <activity android:name=".Main.other.StatusDetail.StatusDetailActivity" />
         <activity android:name=".Main.other.Stories.ShowAllStoriesActivity" />
         <activity android:name=".Main.other.Stories.UploadStoriesActivity" />

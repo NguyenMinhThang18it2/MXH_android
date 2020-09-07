@@ -269,7 +269,7 @@ public class CommentBottomSheetDialog extends BottomSheetDialogFragment implemen
         txtNumberLikeCmt.setText(""+commentArrayList.get(position).getNumberLike().length);
         Glide.with(getContext()).load(BASE_URL+"uploads/"+commentArrayList.get(position).getIduser().getAvata())
                 .into(avataUserCmt);
-        if(commentArrayList.get(position).getFile().getImageComment().length()>10){
+        if(commentArrayList.get(position).getFile().getImageComment().length() > 10){
             ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) roundedImageView.getLayoutParams();
             layoutParams.width = 600;
             layoutParams.height = 350;
@@ -383,7 +383,7 @@ public class CommentBottomSheetDialog extends BottomSheetDialogFragment implemen
                                 commentArrayList.add(comment);
                             }
                         }
-                        commentAdapter = new commentAdapter(commentArrayList,getContext(), mListener);
+                        commentAdapter = new commentAdapter(commentArrayList,getContext(), token, mListener);
                         recyclerViewCmt.setAdapter(commentAdapter);
                         new Handler().postDelayed(new Runnable() {
                             @Override
@@ -477,7 +477,7 @@ public class CommentBottomSheetDialog extends BottomSheetDialogFragment implemen
                     }
                     commentAdapter.notifyDataSetChanged();
 
-                    commentAdapter = new commentAdapter(commentArrayList,getContext(), mListener);
+                    commentAdapter = new commentAdapter(commentArrayList,getContext(), token, mListener);
                     recyclerViewCmt.setAdapter(commentAdapter);
                 }
             });

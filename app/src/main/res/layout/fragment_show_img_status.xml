@@ -8,7 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center">
-        <ImageView
+        <com.zolad.zoominimageview.ZoomInImageView
             android:id="@+id/imgdialog"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

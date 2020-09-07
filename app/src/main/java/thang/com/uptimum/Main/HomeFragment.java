@@ -44,6 +44,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import thang.com.uptimum.Dialog.CommentBottomSheetDialog;
 import thang.com.uptimum.Dialog.DialogMenuPosts;
+import thang.com.uptimum.Dialog.DialogMenuSharePosts;
 import thang.com.uptimum.Dialog.DialogShowImageStatus;
 import thang.com.uptimum.Main.other.StatusDetail.StatusDetailActivity;
 import thang.com.uptimum.Main.other.Stories.ShowAllStoriesActivity;
@@ -106,10 +107,13 @@ public class HomeFragment extends Fragment implements View.OnClickListener , Com
 
     private postsAdapter.RecyclerviewClickListener listener;
 
+    public static HomeFragment newInstance() {
 
-    public static HomeFragment newInstance(){
-        // Required empty public constructor
-        return new HomeFragment();
+        Bundle args = new Bundle();
+
+        HomeFragment fragment = new HomeFragment();
+        fragment.setArguments(args);
+        return fragment;
     }
 
     @Override
@@ -205,18 +209,21 @@ public class HomeFragment extends Fragment implements View.OnClickListener , Com
                 break;
         }
     }
+    public void refresh(){
+        txtThongbao.setVisibility(View.GONE);
+        shimmerLayout.setVisibility(View.VISIBLE);
+        nestedScrollView.setVisibility(View.INVISIBLE);
+        getStory();
+        getPosts();
+        addDataUserlogin();
+        freeMemory();
+        swipe_refresh_layout.setRefreshing(false);
+    }
     private void addEvents() {
         swipe_refresh_layout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                txtThongbao.setVisibility(View.GONE);
-                shimmerLayout.setVisibility(View.VISIBLE);
-                nestedScrollView.setVisibility(View.INVISIBLE);
-                getStory();
-                getPosts();
-                addDataUserlogin();
-                freeMemory();
-                swipe_refresh_layout.setRefreshing(false);
+                refresh();
             }
         });
         linearShowAllStories.setOnClickListener(this);
@@ -313,7 +320,9 @@ public class HomeFragment extends Fragment implements View.OnClickListener , Com
                 }else{
                     List<Posts> posts = response.body();
                     for(Posts post : posts){
-                        if(post.getFile().getVideo().length()<10)
+                        if(post.getFile().getVideo() == null)
+                            arrayPosts.add(post);
+                        else if(post.getFile().getVideo().length() < 10)
                             arrayPosts.add(post);
                     }
                     Collections.reverse(arrayPosts);
@@ -379,6 +388,13 @@ public class HomeFragment extends Fragment implements View.OnClickListener , Com
                 personal.putExtra("coverimage", arrayPosts.get(position).getIduser().getCoverimage());
                 personal.putExtra("username",arrayPosts.get(position).getIduser().getUsername());
                 startActivity(personal);
+            }
+
+            @Override
+            public void sharePosts(int position) {
+                DialogMenuSharePosts dialogMenuSharePosts
+                        = new DialogMenuSharePosts(getContext().getApplicationContext(), arrayPosts.get(position).getId(), arrayPosts.get(position).getIduser().getId());
+                dialogMenuSharePosts.show(getFragmentManager(), "menu share posts");
             }
         };
 

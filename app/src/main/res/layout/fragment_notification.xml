@@ -15,7 +15,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
-                <LinearLayout
+                <RelativeLayout
                     android:id="@+id/titleNotification"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -23,6 +23,7 @@
                     android:paddingRight="10dp"
                     android:paddingTop="10dp">
                     <TextView
+                        android:layout_alignParentLeft="true"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Thông báo"
@@ -30,8 +31,20 @@
                         android:textColor="@color/title"
                         android:textStyle="bold"
                         android:fontFamily="sans-serif-medium"/>
-                </LinearLayout>
+                    <de.hdodenhof.circleimageview.CircleImageView
+                        android:id="@+id/btnSearch"
+                        android:layout_marginRight="10dp"
+                        android:padding="5dp"
+                        android:layout_centerInParent="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/ic_search_black_24dp"
+                        android:background="@drawable/button_video_img_personal"/>
+                </RelativeLayout>
                 <LinearLayout
+                    android:visibility="gone"
+                    android:id="@+id/newNotification"
                     android:layout_marginTop="10dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -54,14 +67,17 @@
                         android:id="@+id/recyclerviewNewNotification"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"/>
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="0.01dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:background="@color/colorText"/>
                 </LinearLayout>
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="0.01dp"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
-                    android:background="@color/colorText"/>
                 <LinearLayout
+                    android:visibility="gone"
+                    android:id="@+id/AddFriendNotification"
                     android:layout_marginTop="10dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -121,14 +137,17 @@
                             </LinearLayout>
                         </LinearLayout>
                     </RelativeLayout>
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="0.01dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginLeft="10dp"
+                        android:layout_marginRight="10dp"
+                        android:background="@color/colorText"/>
                 </LinearLayout>
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="0.01dp"
-                    android:layout_marginLeft="10dp"
-                    android:layout_marginRight="10dp"
-                    android:background="@color/colorText"/>
                 <LinearLayout
+                    android:visibility="gone"
+                    android:id="@+id/oldNotification"
                     android:layout_marginTop="10dp"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

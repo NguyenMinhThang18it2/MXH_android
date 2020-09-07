@@ -1,6 +1,7 @@
 package thang.com.uptimum.Main;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
@@ -15,6 +16,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -28,12 +30,14 @@ import java.util.Collections;
 
 import static thang.com.uptimum.Socket.SocketIO.socket;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import io.socket.emitter.Emitter;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import thang.com.uptimum.Date.Timeupload;
+import thang.com.uptimum.Main.SwipeTouch.FriendRequetsActivity;
 import thang.com.uptimum.R;
 import thang.com.uptimum.adapter.friendrequestAdapter;
 import thang.com.uptimum.adapter.notificationAdapter;
@@ -46,12 +50,14 @@ import thang.com.uptimum.network.NotificationRetrofit;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class NotificationFragment extends Fragment {
+public class NotificationFragment extends Fragment implements View.OnClickListener{
     private static final String TAG = "NotificationFragment";
     private View view;
     private RecyclerView recyclerViewNotification, recyclerViewFriendReq, recyclerviewNewNotification;
     private LinearLayoutManager linearLayoutManagerNotify, linearLayoutManagerFriendReq, linearLayoutManagerNewNotify;
+    private LinearLayout newNotification, AddFriendNotification, oldNotification;
     private SwipeRefreshLayout refreshNotification;
+    private CircleImageView btnSearch;
     // notification
     private ArrayList<ListNotification> listNotificationsArr;
     private notificationAdapter notificationAdapter;
@@ -70,10 +76,20 @@ public class NotificationFragment extends Fragment {
     private NetworkUtil networkUtil;
     private Retrofit retrofit;
     private NotificationRetrofit notificationRetrofit;
+    private friendrequestAdapter.onClickItemFriendRequest mListener;
     public NotificationFragment() {
         // Required empty public constructor
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -88,13 +104,19 @@ public class NotificationFragment extends Fragment {
         eventListener();
         getData();
         listenerUpdateData();
+        onListenerClick();
         return view;
     }
     private void maping(){
+        btnSearch = (CircleImageView) view.findViewById(R.id.btnSearch);
         refreshNotification = (SwipeRefreshLayout) view.findViewById(R.id.refreshNotification);
         recyclerViewNotification = (RecyclerView) view.findViewById(R.id.recyclerViewNotification);
         recyclerviewNewNotification = (RecyclerView) view.findViewById(R.id.recyclerviewNewNotification);
         recyclerViewFriendReq = (RecyclerView) view.findViewById(R.id.recyclerViewFriendReq);
+        newNotification = (LinearLayout) view.findViewById(R.id.newNotification);
+        AddFriendNotification = (LinearLayout) view.findViewById(R.id.AddFriendNotification);
+        oldNotification = (LinearLayout) view.findViewById(R.id.oldNotification);
+
         recyclerviewNewNotification.setHasFixedSize(true);
         recyclerViewFriendReq.setHasFixedSize(true);
         recyclerViewNotification.setHasFixedSize(true);
@@ -114,6 +136,9 @@ public class NotificationFragment extends Fragment {
         sessionManagement = getContext().getApplicationContext().getSharedPreferences("userlogin", Context.MODE_PRIVATE);
         iduser = sessionManagement.getString("id","");
         token = "Bearer "+sessionManagement.getString("token","");
+
+        btnSearch.setOnClickListener(this);
+        recyclerViewFriendReq.setOnClickListener(this);
     }
     private void eventListener(){
         refreshNotification.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -179,15 +204,22 @@ public class NotificationFragment extends Fragment {
                         Collections.reverse(listNewNotify);
                         Collections.reverse(listNotificationsArr);
                         Collections.reverse(listFriendReqArr);
-
-                        notificationAdapter = new notificationAdapter(listNotificationsArr, getContext());
-                        recyclerViewNotification.setAdapter(notificationAdapter);
-
-                        friendrequestAdapter = new friendrequestAdapter(listFriendReqArr, getContext());
-                        recyclerViewFriendReq.setAdapter(friendrequestAdapter);
-
-                        notificationAdapter = new notificationAdapter(listNewNotify, getContext());
-                        recyclerviewNewNotification.setAdapter(notificationAdapter);
+                        Log.d(TAG, " "+listNotificationsArr.size()+" "+listFriendReqArr.size()+" "+listNewNotify.size());
+                        if(listNewNotify.size() > 0){
+                            newNotification.setVisibility(View.VISIBLE);
+                            notificationAdapter = new notificationAdapter(listNewNotify, getContext());
+                            recyclerviewNewNotification.setAdapter(notificationAdapter);
+                        }else newNotification.setVisibility(View.GONE);
+                        if(listFriendReqArr.size() > 0){
+                            AddFriendNotification.setVisibility(View.VISIBLE);
+                            friendrequestAdapter = new friendrequestAdapter(listFriendReqArr, getContext(), mListener);
+                            recyclerViewFriendReq.setAdapter(friendrequestAdapter);
+                        }else AddFriendNotification.setVisibility(View.GONE);
+                        if(listNotificationsArr.size() > 0){
+                            oldNotification.setVisibility(View.VISIBLE);
+                            notificationAdapter = new notificationAdapter(listNotificationsArr, getContext());
+                            recyclerViewNotification.setAdapter(notificationAdapter);
+                        }else oldNotification.setVisibility(View.GONE);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -232,7 +264,8 @@ public class NotificationFragment extends Fragment {
     private Emitter.Listener getListenerUpdateData = new Emitter.Listener() {
         @Override
         public void call(Object... args) {
-            getActivity().runOnUiThread(new Runnable() {
+            Handler mHandler = new Handler(Looper.getMainLooper());
+            mHandler.post(new Runnable() {
                 @Override
                 public void run() {
                     JSONObject jsonObject = (JSONObject) args[0];
@@ -266,20 +299,28 @@ public class NotificationFragment extends Fragment {
                         friendrequestAdapter.notifyDataSetChanged();
                         notificationAdapter.notifyDataSetChanged();
 
-                        notificationAdapter = new notificationAdapter(listNotificationsArr, getContext().getApplicationContext());
-                        recyclerViewNotification.setAdapter(notificationAdapter);
-
-                        friendrequestAdapter = new friendrequestAdapter(listFriendReqArr, getContext());
-                        recyclerViewFriendReq.setAdapter(friendrequestAdapter);
-
-                        notificationAdapter = new notificationAdapter(listNewNotify, getContext());
-                        recyclerviewNewNotification.setAdapter(notificationAdapter);
                         Log.d("qưeqweqw123123e", " lấy xuống");
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
+                    if(listNewNotify.size() > 0){
+                        newNotification.setVisibility(View.VISIBLE);
+                        notificationAdapter = new notificationAdapter(listNewNotify, getContext());
+                        recyclerviewNewNotification.setAdapter(notificationAdapter);
+                    }else newNotification.setVisibility(View.GONE);
+                    if(listFriendReqArr.size() > 0){
+                        AddFriendNotification.setVisibility(View.VISIBLE);
+                        friendrequestAdapter = new friendrequestAdapter(listFriendReqArr, getContext(), mListener);
+                        recyclerViewFriendReq.setAdapter(friendrequestAdapter);
+                    }else AddFriendNotification.setVisibility(View.GONE);
+                    if(listNotificationsArr.size() > 0){
+                        oldNotification.setVisibility(View.VISIBLE);
+                        notificationAdapter = new notificationAdapter(listNotificationsArr, getContext());
+                        recyclerViewNotification.setAdapter(notificationAdapter);
+                    }else oldNotification.setVisibility(View.GONE);
                 }
             });
+
         }
     };
     private void readAll(){
@@ -308,5 +349,29 @@ public class NotificationFragment extends Fragment {
                 call.cancel();
             }
         });
+    }
+
+    @Override
+    public void onClick(View v) {
+        Intent intent;
+        switch (v.getId()){
+            case R.id.recyclerViewFriendReq:
+                intent = new Intent(getContext(), FriendRequetsActivity.class);
+                intent.putExtra("array", listFriendReqArr);
+                startActivity(intent);
+            case R.id.btnSearch:
+                intent = new Intent(getContext(), SearchActivity.class);
+                startActivity(intent);
+                break;
+        }
+    }
+    private void onListenerClick(){
+        mListener = new friendrequestAdapter.onClickItemFriendRequest() {
+            @Override
+            public void onClick(int position) {
+                Intent intent = new Intent(getContext(), FriendRequetsActivity.class);
+                startActivity(intent);
+            }
+        };
     }
 }

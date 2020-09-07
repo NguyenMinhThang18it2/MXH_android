@@ -55,6 +55,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import thang.com.uptimum.Dialog.CommentBottomSheetDialog;
 import thang.com.uptimum.Dialog.DialogMenuPosts;
+import thang.com.uptimum.Dialog.DialogMenuSharePosts;
 import thang.com.uptimum.Dialog.DialogShowImageStatus;
 import thang.com.uptimum.Main.other.Personal.Personal_informationActivity;
 import thang.com.uptimum.Main.other.Personal.ShowImagePersonalActivity;
@@ -653,6 +654,13 @@ public class PersonalActivity extends AppCompatActivity implements View.OnClickL
 
             }
 
+            @Override
+            public void sharePosts(int position) {
+                DialogMenuSharePosts dialogMenuSharePosts
+                        = new DialogMenuSharePosts(PersonalActivity.this, arrayPosts.get(position).getId(), arrayPosts.get(position).getIduser().getId());
+                dialogMenuSharePosts.show(getSupportFragmentManager(), " menu share");
+            }
+
 
         };
         mListenerFriend = new AdapterFriendPf.OnclickRecycelListener() {
@@ -727,7 +735,7 @@ public class PersonalActivity extends AppCompatActivity implements View.OnClickL
             e.printStackTrace();
         }
         socket.emit("add notication friend", jsonObject);
-        socket.on("add friend success", callbackAddfriend);
+        socket.on("add notification friend", callbackAddfriend);
     }
     private void getFriendNotification(){
         Log.d(TAG, "getFriendNotification ");

@@ -77,4 +77,13 @@ public interface PostsRetrofit {
             @Path("id") String idposts,
             @Field("document") String document
     );
+
+    @POST("api/posts/share")
+    @FormUrlEncoded
+    Call<Error> sharePosts(
+            @Header("Authorization") String auth,
+            @Field("iduser") String iduser,
+            @Field("document") String document,
+            @Field("idshareposts") String idshareposts
+    );
 }

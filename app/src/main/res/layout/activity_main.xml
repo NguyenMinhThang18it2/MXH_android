@@ -50,11 +50,6 @@
                         android:background="@drawable/button_video_img_personal"/>
                 </RelativeLayout>
             </androidx.appcompat.widget.Toolbar>
-            <View
-            android:layout_width="match_parent"
-            android:layout_height="3dp"
-            android:background="@color/colorDivider"
-            app:layout_constraintBottom_toBottomOf="@+id/tablayout"/>
             <com.google.android.material.tabs.TabLayout
                 android:id="@+id/tablayout"
                 android:layout_width="match_parent"

@@ -59,9 +59,16 @@ public class notificationAdapter extends RecyclerView.Adapter<notificationAdapte
                     +"<font color=#505050> đã bình luận bài viết của </font><b>"+ listNotifications.get(position).getIdPosts().getIduser().getUsername()+ "</b> ";
             holder.txtDocumentNotify.setText(Html.fromHtml(documentNotify));
         }else if(listNotifications.get(position).getTitle().equals("likeposts")){
-            Picasso.get().load(R.drawable.icon_like_notification).into(holder.imgStatusNotify);
-            String documentNotify = "<b>" + listNotifications.get(position).getIduserNotify().getUsername() + "</b>"
-                    +"<font color=#505050> đã thích bài viết của bạn</font>";
+            String documentNotify = "";
+            if(listNotifications.get(position).getTypeLike() == 0){
+                documentNotify = "<b>" + listNotifications.get(position).getIduserNotify().getUsername() + "</b>"
+                        +"<font color=#505050> đã thích bài viết của bạn</font>";
+            }else{
+                documentNotify = "<b>" + listNotifications.get(position).getIduserNotify().getUsername() + "</b>"
+                        +"<font color=#505050> đã bày tỏ cảm xúc về bài viết của bạn</font>";
+            }
+            Picasso.get().load(typeEmotionName(listNotifications.get(position).getTypeLike())).into(holder.imgStatusNotify);
+
             holder.txtDocumentNotify.setText(Html.fromHtml(documentNotify));
         }else if(listNotifications.get(position).getTitle().equals("follow")){
             Picasso.get().load(R.drawable.icon_followe_notification).into(holder.imgStatusNotify);
@@ -72,6 +79,16 @@ public class notificationAdapter extends RecyclerView.Adapter<notificationAdapte
             Picasso.get().load(R.drawable.icon_comment_notification).into(holder.imgStatusNotify);
             String documentNotify = "<b>" + listNotifications.get(position).getIduserNotify().getUsername() + "</b> "
                     +"<font color=#505050> đã trả lời bình luận của </font>";
+            holder.txtDocumentNotify.setText(Html.fromHtml(documentNotify));
+        }else if(listNotifications.get(position).getTitle().equals("shareposts")){
+            Picasso.get().load(R.drawable.ic_share_notification).into(holder.imgStatusNotify);
+            String documentNotify = "<b>" + listNotifications.get(position).getIduserNotify().getUsername() + "</b> "
+                    +"<font color=#505050> đã chia sẽ bài viết của bạn </font>";
+            holder.txtDocumentNotify.setText(Html.fromHtml(documentNotify));
+        }else if(listNotifications.get(position).getTitle().equals("addfriendsuccess")){
+            Picasso.get().load(R.drawable.ic_pload_tabfriend).into(holder.imgStatusNotify);
+            String documentNotify = "<b> Bạn và" + listNotifications.get(position).getIduserNotify().getUsername() + "</b> "
+                    +"<font color=#505050> đã trở thành bạn bè</font>";
             holder.txtDocumentNotify.setText(Html.fromHtml(documentNotify));
         }
         // còn new post vs new story
@@ -116,5 +133,33 @@ public class notificationAdapter extends RecyclerView.Adapter<notificationAdapte
             imgStatusNotify.setImageDrawable(null);
         }
     }
-
+    private int typeEmotionName(int typeEmotion){
+        int emotion = 0;
+        switch (typeEmotion){
+            case 0:
+                emotion = R.drawable.icon_like_facebook;
+                break;
+            case 1:
+                emotion = R.drawable.ic_love_png;
+                break;
+            case 2:
+                emotion = R.drawable.ic_care_png;
+                break;
+            case 3:
+                emotion = R.drawable.ic_haha_png;
+                break;
+            case 4:
+                emotion = R.drawable.ic_wow_png;
+                break;
+            case 5:
+                emotion = R.drawable.ic_sad_png;
+                break;
+            case 6:
+                emotion = R.drawable.ic_angry_png;
+                break;
+            default:
+                emotion = R.drawable.icon_dislike;
+        }
+        return emotion;
+    }
 }

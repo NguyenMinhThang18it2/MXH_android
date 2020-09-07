@@ -84,7 +84,10 @@ public class VideoFragment extends Fragment {
                 }
                 List<Posts> posts = response.body();
                 for(Posts post : posts){
-                    if(post.getFile().getVideo().length()>10){
+                    if(post.getFile().getVideo() == null){
+
+                    }
+                    else if(post.getFile().getVideo().length()>10){
                         arrayVideo.add(post);
                     }
                 }

@@ -13,6 +13,8 @@ public class ListNotification {
     private Users iduserNotify;
     @SerializedName("status")
     private boolean status;
+    @SerializedName("typeLike")
+    private int typeLike;
     @SerializedName("title")
     private String title;
     @SerializedName("createdAt")
@@ -20,12 +22,13 @@ public class ListNotification {
     @SerializedName("updatedAt")
     private String updateAt;
 
-    public ListNotification(String id, Posts idPosts, String idStory, Users iduserNotify, boolean status, String title, String createAt, String updateAt) {
+    public ListNotification(String id, Posts idPosts, String idStory, Users iduserNotify, boolean status, int typeLike, String title, String createAt, String updateAt) {
         this.id = id;
         this.idPosts = idPosts;
         this.idStory = idStory;
         this.iduserNotify = iduserNotify;
         this.status = status;
+        this.typeLike = typeLike;
         this.title = title;
         this.createAt = createAt;
         this.updateAt = updateAt;
@@ -39,6 +42,7 @@ public class ListNotification {
                 ", idStory='" + idStory + '\'' +
                 ", iduserNotify=" + iduserNotify +
                 ", status=" + status +
+                ", typeLike=" + typeLike +
                 ", title='" + title + '\'' +
                 ", createAt='" + createAt + '\'' +
                 ", updateAt='" + updateAt + '\'' +
@@ -83,6 +87,14 @@ public class ListNotification {
 
     public void setStatus(boolean status) {
         this.status = status;
+    }
+
+    public int getTypeLike() {
+        return typeLike;
+    }
+
+    public void setTypeLike(int typeLike) {
+        this.typeLike = typeLike;
     }
 
     public String getTitle() {

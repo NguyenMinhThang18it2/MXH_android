@@ -368,7 +368,7 @@ public class videoAdapter extends RecyclerView.Adapter<videoAdapter.ViewHolder>{
                                 commentArrayList.add(comment);
                             }
                         }
-                        commentAdapter commentAdapter = new commentAdapter(commentArrayList,context.getApplicationContext(), mListener);
+                        commentAdapter commentAdapter = new commentAdapter(commentArrayList,context.getApplicationContext(), null, mListener);
                         recyclerViewCmt.setAdapter(commentAdapter);
                         Log.d("dataaaaaaa"," "+ commentArrayList);
 

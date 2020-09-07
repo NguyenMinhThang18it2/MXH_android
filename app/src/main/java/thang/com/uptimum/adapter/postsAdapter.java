@@ -205,6 +205,11 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
                             if(posts.get(position).getId().equals(idpost)){
                                 showNumberEmotion(holder, postsmodel.getLike());
                                 checkLikeAndCmt(position, holder, null, postsmodel);
+                                if (holder.rltLikeAndCmt.getVisibility() == View.VISIBLE){
+
+                                }else{
+                                    holder.gachngangInLikePosts.setVisibility(View.GONE);
+                                }
                             }
 //                            if(idpost.equals(posts.get(position).getId())){
 //                                holder.txtNumberLike.setText(numberlikeposts);
@@ -217,7 +222,7 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
             }
         });
         // end like ------------------------------------------------------------------
-        if(posts.get(position).getFile().getImage().length > 0) {
+        if(posts.get(position).getFile().getImage().length > 0 && posts.get(position).getFile().getImage() != null) {
             holder.txtDocument.setText(posts.get(position).getDocument());
 
             ArrayList<String> UrlImg = new ArrayList<>();
@@ -226,94 +231,7 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
             }
             girlLayoutImg(UrlImg, holder.imgStatus, holder.rcvShowMultiImg);
 
-        }
-        else if(posts.get(position).getFile().getVideo().length()>10){
-            holder.rcvShowMultiImg.setVisibility(View.GONE);
-            holder.txtDocument.setText(posts.get(position).getDocument());
-            holder.imgStatus.setVisibility(View.GONE);
-            holder.framevideo.setVisibility(View.VISIBLE);
-            String pathvideo = BASE_URL+"uploads/"+posts.get(position).getFile().getVideo();
-            Log.d("testquwe", " "+pathvideo);
-            Uri uri = Uri.parse(pathvideo);
-            LoadControl loadControl = new DefaultLoadControl();
-            BandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
-            TrackSelector trackSelector = new DefaultTrackSelector(new AdaptiveTrackSelection.Factory(bandwidthMeter));
-            player = ExoPlayerFactory.newSimpleInstance(context,trackSelector,loadControl);
-            DefaultHttpDataSourceFactory factory = new DefaultHttpDataSourceFactory("exoplayer_video");
-            ExtractorsFactory extractorsFactory = new DefaultExtractorsFactory();
-            MediaSource mediaSource = new ExtractorMediaSource(uri,factory,extractorsFactory,null,null);
-            holder.videoView.setPlayer(player);
-            holder.videoView.setKeepScreenOn(true);
-            player.prepare(mediaSource);
-            player.setPlayWhenReady(false);
-            player.addListener(new Player.EventListener() {
-                @Override
-                public void onTimelineChanged(Timeline timeline, int reason) {
-
-                }
-
-                @Override
-                public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
-
-                }
-
-                @Override
-                public void onLoadingChanged(boolean isLoading) {
-
-                }
-
-                @Override
-                public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-                    if(playbackState == Player.STATE_BUFFERING){
-                        holder.progressBar.setVisibility(View.VISIBLE);
-                    }else if(playbackState == Player.STATE_READY){
-                        holder.progressBar.setVisibility(View.GONE);
-                    }
-                }
-
-                @Override
-                public void onRepeatModeChanged(int repeatMode) {
-
-                }
-
-                @Override
-                public void onShuffleModeEnabledChanged(boolean shuffleModeEnabled) {
-
-                }
-
-                @Override
-                public void onPlaybackSuppressionReasonChanged(int playbackSuppressionReason) {
-
-                }
-
-                @Override
-                public void onIsPlayingChanged(boolean isPlaying) {
-
-                }
-
-                @Override
-                public void onPlayerError(ExoPlaybackException error) {
-
-                }
-
-                @Override
-                public void onPositionDiscontinuity(int reason) {
-
-                }
-
-                @Override
-                public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
-
-                }
-
-                @Override
-                public void onSeekProcessed() {
-
-                }
-            });
-
-        }
-        else{
+        }else if(posts.get(position).getFile().getBackground() != null && posts.get(position).getFile().getBackground().length() > 0){
             holder.rcvShowMultiImg.setVisibility(View.GONE);
             holder.txtDocument.setVisibility(View.GONE);
             holder.imgStatus.setVisibility(View.GONE);
@@ -338,6 +256,57 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
                         themesPosition.equals("theme-1591456439234-168554446.jpg")||themesPosition.equals("theme-1591456445824-173683564.jpg")){
                 holder.textStatusBacground.setTextColor(Color.WHITE);
             }
+        }
+        else{
+            holder.txtDocument.setText(posts.get(position).getDocument());
+
+            holder.rltBorderPostsShare.setVisibility(View.VISIBLE);
+            holder.rltPostsShareTop.setVisibility(View.VISIBLE);
+            holder.viewBottomImgPosts.setVisibility(View.VISIBLE);
+            if (holder.rltLikeAndCmt.getVisibility() == View.VISIBLE){
+
+            }else{
+                holder.gachngangInLikePosts.setVisibility(View.GONE);
+            }
+            // set thông tin bài viết được chia sẽ
+            Glide.with(context).load(BASE_URL+"uploads/"+posts.get(position).getIdshareposts().getIduser().getAvata()).into(holder.AvatauserShare);
+            holder.txtusernameShare.setText(posts.get(position).getIdshareposts().getIduser().getUsername());
+            holder.txtTimeUploadShare.setText(date.time(posts.get(position).getIdshareposts().getCreatedAt()));
+            holder.txtdocumentShare.setText(posts.get(position).getIdshareposts().getDocument());
+            ArrayList<String> UrlImg = new ArrayList<>();
+            for(int i = 0; i< posts.get(position).getIdshareposts().getFile().getImage().length; i++){
+                UrlImg.add(posts.get(position).getIdshareposts().getFile().getImage()[i]);
+            }
+            Log.d(TAG, " "+UrlImg);
+            if(UrlImg.size() > 0)
+                girlLayoutImg(UrlImg, holder.imgStatus, holder.rcvShowMultiImg);
+            if(posts.get(position).getIdshareposts().getFile().getBackground().length() > 10){
+                holder.rcvShowMultiImg.setVisibility(View.GONE);
+                holder.txtDocument.setVisibility(View.GONE);
+                holder.imgStatus.setVisibility(View.GONE);
+                holder.framevideo.setVisibility(View.GONE);
+                holder.textStatusBacground.setVisibility(View.VISIBLE);
+                holder.textStatusBacground.setText(posts.get(position).getIdshareposts().getDocument());
+                Glide.with(context).asBitmap().load(BASE_URL+"uploads/"+posts.get(position).getIdshareposts().getFile().getBackground())
+                        .into(new CustomTarget<Bitmap>() {
+                            @Override
+                            public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                                holder.textStatusBacground.setBackground(new BitmapDrawable(resource));
+                            }
+
+                            @Override
+                            public void onLoadCleared(@Nullable Drawable placeholder) {
+
+                            }
+                        });
+                String themesPosition = posts.get(position).getIdshareposts().getFile().getBackground();
+                if(themesPosition.equals("theme-1591455100989-800497553.jpg")||themesPosition.equals("theme-1591455108514-450060551.jpg")||
+                        themesPosition.equals("theme-1591455118097-266327722.jpg")||themesPosition.equals("theme-1591455433956-958748998.jpg")||
+                        themesPosition.equals("theme-1591456439234-168554446.jpg")||themesPosition.equals("theme-1591456445824-173683564.jpg")){
+                    holder.textStatusBacground.setTextColor(Color.WHITE);
+                }
+            }
+
         }
 
         for (int i = 0; i < holder.arrGif.size(); i++){
@@ -398,15 +367,16 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
     }
 
     public class ViewHolder  extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener{
-        private TextView txtName, txtDocument, txtEmotion, txtNumberLike, txtCmt, textStatusBacground, txtTimeUpload;
+        private TextView txtName, txtDocument, txtEmotion, txtNumberLike, txtCmt, textStatusBacground, txtTimeUpload, txtusernameShare, txtTimeUploadShare, txtdocumentShare;
+        private View viewBottomImgPosts, gachngangInLikePosts;
 //        private ZoomInImageView ;
         private ImageView imgbtnLike, volume_control,exo_play,exo_pause, imgStatus, menu;
         private PlayerView videoView;
         private FrameLayout framevideo;
         private ProgressBar progressBar;
-        private RelativeLayout btnComment, btnLike, ejmotionLike, rltlayoutHideButton, rltLikeAndCmt;
+        private RelativeLayout btnComment, btnLike, ejmotionLike, rltlayoutHideButton, rltLikeAndCmt, rltButtonSharePosts, rltPostsShareTop, rltBorderPostsShare;
         private RecyclerView rcvShowMultiImg, rcvIconStatus;
-        private CircleImageView Avatauser, iconLike0, iconLike1, iconLike2;
+        private CircleImageView Avatauser, iconLike0, iconLike1, iconLike2, AvatauserShare;
         private LinearLayout linearStatus, linearbgrRecycler;
         //Emoition
         private RelativeLayout rlvEmotionReaction, rltemotionLike, rltemotionLove, rltemotionThuongThuong, rltemotionHaHa
@@ -431,6 +401,7 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
             linearStatus.setOnClickListener(this);
             Avatauser.setOnClickListener(this);
             menu.setOnClickListener(this);
+            rltButtonSharePosts.setOnClickListener(this);
 
             btnLike.setOnLongClickListener(this);
         }
@@ -481,6 +452,9 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
                     case R.id.menu:
                         Listener.onclickMenu(getAdapterPosition());
                         break;
+                    case R.id.rltButtonSharePosts:
+                        Listener.sharePosts(getAdapterPosition());
+                        break;
                 }
             }
         }
@@ -517,6 +491,15 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
         }
         //Touch Emotion
         private void mapingView(View itemView){
+            gachngangInLikePosts = (View) itemView.findViewById(R.id.gachngangInLikePosts);
+            txtdocumentShare = (TextView) itemView.findViewById(R.id.txtdocumentShare);
+            txtTimeUploadShare = (TextView) itemView.findViewById(R.id.txtTimeUploadShare);
+            txtusernameShare = (TextView) itemView.findViewById(R.id.txtusernameShare);
+            AvatauserShare = (CircleImageView) itemView.findViewById(R.id.AvatauserShare);
+            rltBorderPostsShare = (RelativeLayout) itemView.findViewById(R.id.rltBorderPostsShare);
+            rltPostsShareTop = (RelativeLayout) itemView.findViewById(R.id.rltPostsShareTop);
+            viewBottomImgPosts = (View) itemView.findViewById(R.id.viewBottomImgPosts);
+            rltButtonSharePosts = (RelativeLayout) itemView.findViewById(R.id.rltButtonSharePosts);
             rltLikeAndCmt = (RelativeLayout) itemView.findViewById(R.id.rltLikeAndCmt);
             linearStatus = (LinearLayout) itemView.findViewById(R.id.linearStatus);
             Avatauser = (CircleImageView) itemView.findViewById(R.id.Avatauser);
@@ -662,6 +645,7 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
     private int dpToPx(int dp) {
         return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
     }
+    // animation emotion sao khi chọn sẽ phóng to
     private void beforeAnimationChoosing(postsAdapter.ViewHolder holder){
         TransitionManager.beginDelayedTransition(holder.rtlBoardOut, new TransitionSet()
                 .addTransition(new ChangeBounds()).setDuration(400));
@@ -692,6 +676,7 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
             }
         }
     }
+    // animation emotion sao khi bỏ chọn sẽ về kích thước ban đầu
     private void  beforeAnimateNormalBack(postsAdapter.ViewHolder holder){
         Log.d("typelike", " "+currentPosition);
         TransitionManager.beginDelayedTransition(holder.rtlBoardIn, new TransitionSet()
@@ -966,6 +951,7 @@ public class postsAdapter extends RecyclerView.Adapter<postsAdapter.ViewHolder> 
         void showImg(ImageView imgShow, int position, int typeClick);
         void showStatusDetail(String idposts);
         void personalUser(String iduser, int position);
+        void sharePosts(int position);
     }
     private MediaSource buildMediaSource(Uri uri) {
         DataSource.Factory dataSourceFactory =

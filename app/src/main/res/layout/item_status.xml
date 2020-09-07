@@ -71,33 +71,140 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="18dp"
+                android:textColor="@color/title"
                 />
-            <LinearLayout
+            <!--      Posts of user      -->
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:background="#EFEFEF">
-                <ImageView
-                    android:id="@+id/imgStatus"
-                    android:scaleType="centerCrop"
-                    android:layout_weight="1"
+                android:layout_height="wrap_content">
+                <RelativeLayout
+                    android:visibility="gone"
+                    android:id="@+id/rltBorderPostsShare"
+                    android:layout_alignParentTop="true"
                     android:layout_width="match_parent"
-                    android:layout_height="400dp"/>
-                <androidx.recyclerview.widget.RecyclerView
+                    android:layout_height="wrap_content"
+                    android:layout_above="@+id/viewShareBottom"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:background="@drawable/border_share_posts">
+
+                </RelativeLayout>
+                <RelativeLayout
+                    android:visibility="gone"
+                    android:id="@+id/rltPostsShareTop"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="5dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp">
+                    <RelativeLayout
+                        android:id="@+id/rltInforUserPostsShare"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingTop="5dp"
+                        android:paddingLeft="10dp"
+                        android:paddingBottom="10dp"
+                        android:paddingRight="10dp">
+
+                        <de.hdodenhof.circleimageview.CircleImageView
+                            android:id="@+id/AvatauserShare"
+                            android:layout_width="45dp"
+                            android:layout_height="45dp"
+                            android:src="@drawable/user"/>
+                        <TextView
+                            android:id="@+id/txtusernameShare"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_toRightOf="@+id/AvatauserShare"
+                            android:layout_marginLeft="10dp"
+                            android:textColor="#000000"
+                            android:textSize="18dp"
+                            android:textStyle="bold"
+                            android:text="Thắng Nguyễn"
+                            />
+                        <TextView
+                            android:id="@+id/txtTimeUploadShare"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_toRightOf="@+id/AvatauserShare"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginTop="5dp"
+                            android:textSize="12dp"
+                            android:text="Time 12"
+                            android:layout_below="@id/txtusernameShare"
+                            />
+                    </RelativeLayout>
+                    <RelativeLayout
+                        android:layout_below="@+id/rltInforUserPostsShare"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <TextView
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginBottom="10dp"
+                            android:layout_marginTop="1dp"
+                            android:layout_marginRight="10dp"
+                            android:id="@+id/txtdocumentShare"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textSize="18dp"
+                            android:textColor="@color/title"
+                            />
+                    </RelativeLayout>
+                </RelativeLayout>
+                <View
+                    android:visibility="gone"
+                    android:id="@+id/viewBottomImgPosts"
+                    android:layout_below="@+id/rltImgPosts"
+                    android:layout_width="match_parent"
+                    android:layout_height="0.1dp"
+                    android:layout_marginBottom="10dp"/>
+                <View
                     android:visibility="visible"
-                    android:id="@+id/rcvShowMultiImg"
-                    android:layout_weight="2"
+                    android:id="@+id/viewShareBottom"
+                    android:layout_below="@+id/viewBottomImgPosts"
                     android:layout_width="match_parent"
-                    android:layout_height="400dp"/>
-            </LinearLayout>
-            <TextView
-                android:id="@+id/textStatusBacground"
-                android:visibility="gone"
-                android:layout_width="match_parent"
-                android:layout_height="300dp"
-                android:textSize="26sp"
-                android:maxLength="100"
-                android:gravity="center" />
+                    android:layout_height="0.1dp"
+                    />
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/rltPostsShareTop"
+                    android:id="@+id/rltImgPosts">
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <LinearLayout
+                            android:visibility="visible"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:background="#EFEFEF">
+                            <ImageView
+                                android:id="@+id/imgStatus"
+                                android:scaleType="centerCrop"
+                                android:layout_weight="1"
+                                android:layout_width="match_parent"
+                                android:layout_height="400dp"/>
+                            <androidx.recyclerview.widget.RecyclerView
+                                android:visibility="visible"
+                                android:id="@+id/rcvShowMultiImg"
+                                android:layout_weight="2"
+                                android:layout_width="match_parent"
+                                android:layout_height="400dp"/>
+                        </LinearLayout>
+                    </RelativeLayout>
+                    <TextView
+                        android:id="@+id/textStatusBacground"
+                        android:visibility="gone"
+                        android:layout_width="match_parent"
+                        android:layout_height="300dp"
+                        android:textSize="26sp"
+                        android:maxLength="100"
+                        android:gravity="center" />
+                </RelativeLayout>
+            </RelativeLayout>
+
+
             <FrameLayout
                 android:id="@+id/framevideo"
                 android:layout_width="match_parent"
@@ -202,7 +309,7 @@
                 />
         </RelativeLayout>
         <View
-
+            android:id="@+id/gachngangInLikePosts"
             android:layout_gravity="center"
             android:layout_width="match_parent"
             android:layout_height="0.01dp"
@@ -281,6 +388,7 @@
         </RelativeLayout>
 
         <RelativeLayout
+            android:id="@+id/rltButtonSharePosts"
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:layout_weight="1"
@@ -316,7 +424,7 @@
     <RelativeLayout
         android:id="@+id/EmoitionStatus"
         android:animateLayoutChanges="true"
-        android:visibility="v"
+        android:visibility="invisible"
         android:layout_width="match_parent"
         android:layout_height="200dp"
         android:layout_above="@+id/kakaka">

@@ -40,7 +40,7 @@ public class Timeupload {
         else if(d>0) return d + " ngày";
         else if(h>0) return h + " h";
         else if(m>0) return m + " m";
-        else if(s>=0) return "vừa xong";
+        else if(s>=0 || s < 0) return "vừa xong";
         else return null;
     }
     public long NumberTime(String dtStart){

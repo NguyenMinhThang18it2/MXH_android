@@ -67,20 +67,9 @@ public class DialogShowImageStatus extends DialogFragment {
         usernamedialog.setText(posts.get(position).getIduser().getUsername());
         txtLikeDialog.setText(""+posts.get(position).getLike().length);
         AlertDialog alert = builder.create();
-        ViewTouch.setOnTouchListener(new OnSwipeTouchListener(getContext()){
-            public void onSwipeTop() {
-                alert.dismiss();
-            }
-            //                    public void onSwipeRight() {
-//                        Toast.makeText(MyActivity.this, "right", Toast.LENGTH_SHORT).show();
-//                    }
-//                    public void onSwipeLeft() {
-//                        Toast.makeText(MyActivity.this, "left", Toast.LENGTH_SHORT).show();
-//                    }
-            public void onSwipeBottom() {
-                alert.dismiss();
-            }
-            public void onSingleTap(){
+        ViewTouch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 if(!check){
                     menuShowImgDialog.animate().alpha(0.0f).setDuration(500);
                     tinShowImgDialog.animate().alpha(0.0f).setDuration(500);
@@ -94,11 +83,43 @@ public class DialogShowImageStatus extends DialogFragment {
                 }
             }
         });
+//        ViewTouch.setOnTouchListener(new OnSwipeTouchListener(getContext()){
+//            public void onSwipeTop() {
+//                alert.dismiss();
+//            }
+//            //                    public void onSwipeRight() {
+////                        Toast.makeText(MyActivity.this, "right", Toast.LENGTH_SHORT).show();
+////                    }
+////                    public void onSwipeLeft() {
+////                        Toast.makeText(MyActivity.this, "left", Toast.LENGTH_SHORT).show();
+////                    }
+//            public void onSwipeBottom() {
+//                alert.dismiss();
+//            }
+//            public void onSingleTap(){
+//                if(!check){
+//                    menuShowImgDialog.animate().alpha(0.0f).setDuration(500);
+//                    tinShowImgDialog.animate().alpha(0.0f).setDuration(500);
+//                    buttonShowImgDialog.animate().alpha(0.0f).setDuration(500);
+//                    check = true;
+//                }else{
+//                    menuShowImgDialog.animate().alpha(1.0f).setDuration(500);
+//                    tinShowImgDialog.animate().alpha(1.0f).setDuration(500);
+//                    buttonShowImgDialog.animate().alpha(1.0f).setDuration(500);
+//                    check = false;
+//                }
+//            }
+//        });
         // viewpager2
         fragments = new ArrayList<>();
-        for(int i = 0; i < posts.get(position).getFile().getImage().length; i++){
-            fragments.add(new ShowImgStatusFragment(posts.get(position).getFile().getImage()[i]));
-        }
+        if(posts.get(position).getFile().getImage().length > 0)
+            for(int i = 0; i < posts.get(position).getFile().getImage().length; i++){
+                fragments.add(new ShowImgStatusFragment(posts.get(position).getFile().getImage()[i]));
+            }
+        else if(posts.get(position).getIdshareposts().getFile().getImage().length > 0)
+            for(int i = 0; i < posts.get(position).getIdshareposts().getFile().getImage().length; i++){
+                fragments.add(new ShowImgStatusFragment(posts.get(position).getIdshareposts().getFile().getImage()[i]));
+            }
         ImgStatusViewpagerAdapter = new ImgStatusViewpagerAdapter(getFragmentManager(), getLifecycle(), fragments);
         viewpager2ShowImg.setAdapter(ImgStatusViewpagerAdapter);
         return alert;
